@@ -12,6 +12,7 @@ const VisualBlockEditor = () => {
   const [generatedCode, setGeneratedCode] = useState('// Drag blocks from the sidebar to start coding!');
   const [output, setOutput] = useState('Click "Run Code" to see output...');
   const [isRunning, setIsRunning] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript'); // NEW
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
@@ -24,7 +25,6 @@ const VisualBlockEditor = () => {
       },
       data: {}
     };
-    
     setBlocks(prevBlocks => [...prevBlocks, newBlock]);
     setSelectedBlock(newBlock.id);
   }, [blocks.length]);
@@ -55,44 +55,29 @@ const VisualBlockEditor = () => {
     }
   }, []);
 
-  // Update generated code when blocks change
+  // Update generated code when blocks or language change
   useEffect(() => {
-    const code = generateCode(blocks);
+    const code = generateCode(blocks, selectedLanguage); // pass selectedLanguage
     setGeneratedCode(code);
-  }, [blocks]);
+  }, [blocks, selectedLanguage]);
 
   const runCode = async () => {
-    setIsRunning(true);
-    setOutput('Running...');
-    
-    try {
-      // Create a safe execution environment
-      const originalLog = console.log;
-      let capturedOutput = '';
-      
-      console.log = (...args) => {
-        capturedOutput += args.join(' ') + '\n';
-        originalLog(...args);
-      };
-      
-      // Execute the generated code
-      const func = new Function(generatedCode);
-      func();
-      
-      // Restore console.log
-      console.log = originalLog;
-      
-      setTimeout(() => {
-        setOutput(capturedOutput || 'Code executed successfully (no output)');
-        setIsRunning(false);
-      }, 500);
-      
-    } catch (error) {
-      console.error('Execution error:', error);
-      setOutput(`Error: ${error.message}`);
-      setIsRunning(false);
-    }
-  };
+  setIsRunning(true);
+  setOutput('Running...');
+  try {
+    const response = await fetch('http://localhost:5000/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: generatedCode, language: selectedLanguage }),
+    });
+    const data = await response.json();
+    setOutput(data.output);
+  } catch (error) {
+    setOutput(`Error: ${error.message}`);
+  }
+  setIsRunning(false);
+};
+
 
   return (
     <div className="block-editor">
@@ -102,6 +87,18 @@ const VisualBlockEditor = () => {
         <div className="header">
           <h1>🧩 Block Code Editor</h1>
           <div className="header-buttons">
+            <select
+              value={selectedLanguage}
+              onChange={(e) => setSelectedLanguage(e.target.value)}
+              className="language-select"
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="python">Python</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+            </select>
+
             <button 
               onClick={clearCanvas} 
               className="btn btn-danger"
@@ -140,12 +137,12 @@ const VisualBlockEditor = () => {
           
           <div className="editor-panel">
             <div className="editor-header">
-              📝 Generated Code
+              📝 Generated Code ({selectedLanguage})
             </div>
             <div className="monaco-editor-container">
               <Editor
                 height="100%"
-                defaultLanguage="javascript"
+                language={selectedLanguage}
                 value={generatedCode}
                 theme="vs-dark"
                 options={{

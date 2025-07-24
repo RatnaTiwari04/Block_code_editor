@@ -1,165 +1,227 @@
-export const generateCode = (blocks) => {
+export const generateCode = (blocks, selectedLanguage = 'javascript') => {
   if (!blocks || blocks.length === 0) {
     return '// Drag blocks from the sidebar to start coding!\n// Double-click blocks to edit their properties';
   }
 
-  let code = '// Generated code from visual blocks\n\n';
-  
-  // Sort blocks by their vertical position to maintain logical order
+  let codeHeader = {
+    javascript: '// Generated JavaScript code from visual blocks\n\n',
+    python: '# Generated Python code from visual blocks\n\n',
+    java: '// Generated Java code from visual blocks\n\npublic class Main {\n  public static void main(String[] args) {\n',
+    cpp: '// Generated C++ code from visual blocks\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n',
+    c: '// Generated C code from visual blocks\n\n#include <stdio.h>\n\nint main() {\n'
+  }[selectedLanguage] || '';
+
+  let code = codeHeader;
+
+  // Sort blocks by vertical position to keep logical order
   const sortedBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y);
-  
+
   sortedBlocks.forEach((block, index) => {
-    const blockCode = generateBlockCode(block);
+    const blockCode = generateBlockCode(block, selectedLanguage);
     if (blockCode.trim()) {
-      code += blockCode + '\n';
+      // For Java/C/C++, indent inside main()
+      if (['java', 'cpp', 'c'].includes(selectedLanguage)) {
+        code += blockCode
+          .split('\n')
+          .map(line => line.trim() ? `  ${line}` : line)
+          .join('\n') + '\n';
+      } else {
+        code += blockCode + '\n';
+      }
       if (index < sortedBlocks.length - 1) {
-        code += '\n'; // Add extra line between blocks
+        code += '\n';
       }
     }
   });
-  
+
+  // Close main method for Java/C/C++
+  if (selectedLanguage === 'java' || selectedLanguage === 'cpp' || selectedLanguage === 'c') {
+    code += '  return 0;\n}\n';
+    if (selectedLanguage === 'java') {
+      code += '}';
+    }
+  }
+
   return code;
 };
 
-const generateBlockCode = (block) => {
+const generateBlockCode = (block, lang) => {
   const data = block.data || {};
-  
   switch (block.type) {
     case 'VARIABLE':
-      return generateVariableCode(data);
-    
+      return generateVariableCode(data, lang);
     case 'FUNCTION':
-      return generateFunctionCode(data);
-    
+      return generateFunctionCode(data, lang);
     case 'IF':
-      return generateIfCode(data);
-    
+      return generateIfCode(data, lang);
     case 'LOOP':
-      return generateLoopCode(data);
-    
+      return generateLoopCode(data, lang);
     case 'PRINT':
-      return generatePrintCode(data);
-    
+      return generatePrintCode(data, lang);
     case 'MATH':
-      return generateMathCode(data);
-    
+      return generateMathCode(data, lang);
     case 'INPUT':
-      return generateInputCode(data);
-    
+      return generateInputCode(data, lang);
     case 'COMMENT':
-      return generateCommentCode(data);
-    
+      return generateCommentCode(data, lang);
     default:
       return `// Unknown block type: ${block.type}`;
   }
 };
 
-const generateVariableCode = (data) => {
+const generateVariableCode = (data, lang) => {
   const name = data.name || 'myVariable';
   const value = data.value || '0';
-  
-  // Check if value looks like a string (contains quotes or letters)
   const isString = isNaN(value) && !value.includes('"') && !value.includes("'") && isNaN(parseFloat(value));
   const formattedValue = isString ? `"${value}"` : value;
-  
-  return `let ${name} = ${formattedValue};`;
+
+  switch (lang) {
+    case 'python':
+      return `${name} = ${formattedValue}`;
+    case 'java':
+      return `int ${name} = ${formattedValue};`;
+    case 'cpp':
+    case 'c':
+      return `int ${name} = ${formattedValue};`;
+    default:
+      return `let ${name} = ${formattedValue};`;
+  }
 };
 
-const generateFunctionCode = (data) => {
+const generateFunctionCode = (data, lang) => {
   const name = data.name || 'myFunction';
   const params = data.params || '';
-  const body = data.body || 'return;';
-  
-  // Ensure proper indentation for function body
-  const indentedBody = body.split('\n')
-    .map(line => line.trim() ? `  ${line}` : line)
-    .join('\n');
-  
-  return `function ${name}(${params}) {\n${indentedBody}\n}`;
-};
+  const body = data.body || '';
 
-const generateIfCode = (data) => {
-  const condition = data.condition || 'true';
-  const thenCode = data.then || 'console.log("condition is true");';
-  const elseCode = data.else || '';
-  
-  // Ensure proper indentation
-  const indentedThen = thenCode.split('\n')
-    .map(line => line.trim() ? `  ${line}` : line)
-    .join('\n');
-  
-  let code = `if (${condition}) {\n${indentedThen}\n}`;
-  
-  if (elseCode.trim()) {
-    const indentedElse = elseCode.split('\n')
-      .map(line => line.trim() ? `  ${line}` : line)
-      .join('\n');
-    code += ` else {\n${indentedElse}\n}`;
+  const indentedBody = body.split('\n').map(line => line.trim() ? `  ${line}` : line).join('\n');
+
+  switch (lang) {
+    case 'python':
+      return `def ${name}(${params}):\n${body ? '  ' + indentedBody.replace(/\n/g, '\n  ') : '  pass'}`;
+    case 'java':
+      return `public static void ${name}(${params}) {\n${indentedBody}\n}`;
+    case 'cpp':
+    case 'c':
+      return `void ${name}(${params}) {\n${indentedBody}\n}`;
+    default:
+      return `function ${name}(${params}) {\n${indentedBody}\n}`;
   }
-  
-  return code;
 };
 
-const generateLoopCode = (data) => {
+const generateIfCode = (data, lang) => {
+  const condition = data.condition || 'true';
+  const thenCode = data.then || '';
+  const elseCode = data.else || '';
+
+  const indent = (code) => code.split('\n').map(line => line.trim() ? `  ${line}` : line).join('\n');
+
+  switch (lang) {
+    case 'python':
+      let pyCode = `if ${condition}:\n${indent(thenCode)}`;
+      if (elseCode.trim()) pyCode += `\nelse:\n${indent(elseCode)}`;
+      return pyCode;
+    default:
+      let otherCode = `if (${condition}) {\n${indent(thenCode)}\n}`;
+      if (elseCode.trim()) otherCode += ` else {\n${indent(elseCode)}\n}`;
+      return otherCode;
+  }
+};
+
+const generateLoopCode = (data, lang) => {
   const variable = data.variable || 'i';
   const start = data.start || '0';
   const end = data.end || '10';
   const step = data.step || '1';
-  const body = data.body || 'console.log(i);';
-  
-  // Ensure proper indentation
-  const indentedBody = body.split('\n')
-    .map(line => line.trim() ? `  ${line}` : line)
-    .join('\n');
-  
-  // Generate appropriate loop based on step value
-  if (step === '1') {
-    return `for (let ${variable} = ${start}; ${variable} < ${end}; ${variable}++) {\n${indentedBody}\n}`;
+  const body = data.body || '';
+
+  const indentedBody = body.split('\n').map(line => line.trim() ? `  ${line}` : line).join('\n');
+
+  if (lang === 'python') {
+    const rangeExpr = (step === '1') ? `range(${start}, ${end})` : `range(${start}, ${end}, ${step})`;
+    return `for ${variable} in ${rangeExpr}:\n${indentedBody.replace(/\n/g, '\n  ')}`;
   } else {
-    return `for (let ${variable} = ${start}; ${variable} < ${end}; ${variable} += ${step}) {\n${indentedBody}\n}`;
+    const stepExpr = (step === '1') ? `${variable}++` : `${variable} += ${step}`;
+    return `for (int ${variable} = ${start}; ${variable} < ${end}; ${stepExpr}) {\n${indentedBody}\n}`;
   }
 };
 
-const generatePrintCode = (data) => {
+const generatePrintCode = (data, lang) => {
   const value = data.value || '"Hello World!"';
-  
-  // Check if the value is a variable name (no quotes) or a literal
   const isVariable = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(value.trim());
   const isAlreadyQuoted = value.includes('"') || value.includes("'");
-  
+
   let formattedValue = value;
   if (!isVariable && !isAlreadyQuoted && isNaN(value)) {
     formattedValue = `"${value}"`;
   }
-  
-  return `console.log(${formattedValue});`;
+
+  switch (lang) {
+    case 'python':
+      return `print(${formattedValue})`;
+    case 'java':
+      return `System.out.println(${formattedValue});`;
+    case 'cpp':
+      return `cout << ${formattedValue} << endl;`;
+    case 'c':
+      return `printf("%s\\n", ${formattedValue});`;
+    default:
+      return `console.log(${formattedValue});`;
+  }
 };
 
-const generateMathCode = (data) => {
+const generateMathCode = (data, lang) => {
   const left = data.left || '0';
   const operator = data.operator || '+';
   const right = data.right || '0';
   const result = data.result || 'result';
-  
-  return `let ${result} = ${left} ${operator} ${right};`;
+
+  switch (lang) {
+    case 'python':
+      return `${result} = ${left} ${operator} ${right}`;
+    case 'java':
+    case 'cpp':
+    case 'c':
+      return `int ${result} = ${left} ${operator} ${right};`;
+    default:
+      return `let ${result} = ${left} ${operator} ${right};`;
+  }
 };
 
-const generateInputCode = (data) => {
-  const prompt = data.prompt || 'Enter a value:';
+const generateInputCode = (data, lang) => {
+  const promptText = data.prompt || 'Enter a value:';
   const variable = data.variable || 'userInput';
-  
-  // Since we can't use actual prompt() in this environment, we'll simulate it
-  return `// Simulated user input (replace with actual input method)\nlet ${variable} = prompt("${prompt}");`;
+
+  switch (lang) {
+    case 'python':
+      return `${variable} = input("${promptText}")`;
+    case 'java':
+      return `// TODO: Scanner input\nString ${variable} = ""; // Replace with actual scanner input`;
+    case 'cpp':
+      return `string ${variable};\ncout << "${promptText}";\ncin >> ${variable};`;
+    case 'c':
+      return `char ${variable}[100];\nprintf("${promptText}");\nscanf("%s", ${variable});`;
+    default:
+      return `// Simulated input\nlet ${variable} = prompt("${promptText}");`;
+  }
 };
 
-const generateCommentCode = (data) => {
+const generateCommentCode = (data, lang) => {
   const text = data.text || 'This is a comment';
-  
-  // Handle multi-line comments
   const lines = text.split('\n');
+
   if (lines.length === 1) {
-    return `// ${text}`;
+    switch (lang) {
+      case 'python':
+        return `# ${text}`;
+      default:
+        return `// ${text}`;
+    }
   } else {
-    return `/*\n${lines.map(line => ` * ${line}`).join('\n')}\n */`;
+    switch (lang) {
+      case 'python':
+        return `"""\n${text}\n"""`;
+      default:
+        return `/*\n${lines.map(line => ` * ${line}`).join('\n')}\n */`;
+    }
   }
 };

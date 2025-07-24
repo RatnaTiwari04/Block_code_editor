@@ -17,7 +17,6 @@ const BlockPalette = ({ onAddBlock }) => {
           </button>
         ))}
       </div>
-      
       <div style={{ marginTop: '30px', fontSize: '12px', color: '#bdc3c7' }}>
         <p><strong>How to use:</strong></p>
         <ul style={{ paddingLeft: '15px', marginTop: '10px' }}>

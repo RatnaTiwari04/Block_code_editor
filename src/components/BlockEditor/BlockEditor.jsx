@@ -6,7 +6,6 @@ import Editor from '@monaco-editor/react';
 import generateCode from '../../utils/codeGenerator';
 import { BLOCK_TYPES } from './BlockTypes/Constants';
 
-
 export { BLOCK_TYPES };
 
 const BlockEditor = () => {
