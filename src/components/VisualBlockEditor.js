@@ -1,0 +1,180 @@
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import Editor from '@monaco-editor/react';
+import { v4 as uuidv4 } from 'uuid';
+import BlockPalette from './BlockPalette';
+import Block from './Block';
+import { BLOCK_TYPES } from '../utils/blockTypes';
+import { generateCode } from '../utils/codeGenerator';
+
+const VisualBlockEditor = () => {
+  const [blocks, setBlocks] = useState([]);
+  const [selectedBlock, setSelectedBlock] = useState(null);
+  const [generatedCode, setGeneratedCode] = useState('// Drag blocks from the sidebar to start coding!');
+  const [output, setOutput] = useState('Click "Run Code" to see output...');
+  const [isRunning, setIsRunning] = useState(false);
+  const canvasRef = useRef(null);
+
+  const addBlock = useCallback((blockType) => {
+    const newBlock = {
+      id: uuidv4(),
+      type: blockType,
+      position: { 
+        x: 100 + (blocks.length * 30), 
+        y: 100 + (blocks.length * 30) 
+      },
+      data: {}
+    };
+    
+    setBlocks(prevBlocks => [...prevBlocks, newBlock]);
+    setSelectedBlock(newBlock.id);
+  }, [blocks.length]);
+
+  const updateBlock = useCallback((blockId, updates) => {
+    setBlocks(prevBlocks => 
+      prevBlocks.map(block => 
+        block.id === blockId ? { ...block, ...updates } : block
+      )
+    );
+  }, []);
+
+  const deleteBlock = useCallback((blockId) => {
+    setBlocks(prevBlocks => prevBlocks.filter(block => block.id !== blockId));
+    if (selectedBlock === blockId) {
+      setSelectedBlock(null);
+    }
+  }, [selectedBlock]);
+
+  const clearCanvas = useCallback(() => {
+    setBlocks([]);
+    setSelectedBlock(null);
+  }, []);
+
+  const handleCanvasClick = useCallback((e) => {
+    if (e.target === canvasRef.current) {
+      setSelectedBlock(null);
+    }
+  }, []);
+
+  // Update generated code when blocks change
+  useEffect(() => {
+    const code = generateCode(blocks);
+    setGeneratedCode(code);
+  }, [blocks]);
+
+  const runCode = async () => {
+    setIsRunning(true);
+    setOutput('Running...');
+    
+    try {
+      // Create a safe execution environment
+      const originalLog = console.log;
+      let capturedOutput = '';
+      
+      console.log = (...args) => {
+        capturedOutput += args.join(' ') + '\n';
+        originalLog(...args);
+      };
+      
+      // Execute the generated code
+      const func = new Function(generatedCode);
+      func();
+      
+      // Restore console.log
+      console.log = originalLog;
+      
+      setTimeout(() => {
+        setOutput(capturedOutput || 'Code executed successfully (no output)');
+        setIsRunning(false);
+      }, 500);
+      
+    } catch (error) {
+      console.error('Execution error:', error);
+      setOutput(`Error: ${error.message}`);
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <div className="block-editor">
+      <BlockPalette onAddBlock={addBlock} />
+      
+      <div className="main-content">
+        <div className="header">
+          <h1>🧩 Block Code Editor</h1>
+          <div className="header-buttons">
+            <button 
+              onClick={clearCanvas} 
+              className="btn btn-danger"
+            >
+              Clear All
+            </button>
+            <button 
+              onClick={runCode} 
+              disabled={isRunning}
+              className="btn btn-success"
+            >
+              {isRunning ? '⏳ Running...' : '▶️ Run Code'}
+            </button>
+          </div>
+        </div>
+
+        <div className="workspace">
+          <div className="canvas-area">
+            <div 
+              ref={canvasRef}
+              className="canvas"
+              onClick={handleCanvasClick}
+            >
+              {blocks.map((block) => (
+                <Block
+                  key={block.id}
+                  block={block}
+                  onUpdate={updateBlock}
+                  onDelete={deleteBlock}
+                  isSelected={selectedBlock === block.id}
+                  onSelect={setSelectedBlock}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <div className="editor-panel">
+            <div className="editor-header">
+              📝 Generated Code
+            </div>
+            <div className="monaco-editor-container">
+              <Editor
+                height="100%"
+                defaultLanguage="javascript"
+                value={generatedCode}
+                theme="vs-dark"
+                options={{
+                  readOnly: false,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  fontSize: 14,
+                  lineNumbers: 'on',
+                  automaticLayout: true,
+                  wordWrap: 'on',
+                  formatOnPaste: true,
+                  formatOnType: true
+                }}
+              />
+            </div>
+            
+            <div className="output-panel">
+              <div className="output-header">
+                💻 Console Output
+              </div>
+              <div className="output-content">
+                {output}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default VisualBlockEditor;
