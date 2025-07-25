@@ -1,13 +1,23 @@
 import React from 'react';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import VisualBlockEditor from './components/VisualBlockEditor';
-
-function App() {
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Navbar from './components/Navbar'; // optional
+import './App.css';
+const App = () => {
   return (
-    <div className="App">
-      <VisualBlockEditor />
-    </div>
+    <Router>
+      <Navbar /> 
+      <Routes>
+        <Route path="/" element={<VisualBlockEditor />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;

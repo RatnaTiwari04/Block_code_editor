@@ -5,6 +5,7 @@ import BlockPalette from './BlockPalette';
 import Block from './Block';
 import { BLOCK_TYPES } from '../utils/blockTypes';
 import { generateCode } from '../utils/codeGenerator';
+import axios from 'axios';
 
 const VisualBlockEditor = () => {
   const [blocks, setBlocks] = useState([]);
@@ -12,7 +13,8 @@ const VisualBlockEditor = () => {
   const [generatedCode, setGeneratedCode] = useState('// Drag blocks from the sidebar to start coding!');
   const [output, setOutput] = useState('Click "Run Code" to see output...');
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('javascript'); // NEW
+  const [selectedLanguage, setSelectedLanguage] = useState('javascript');
+  const [projectTitle, setProjectTitle] = useState('');   // NEW: project title
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
@@ -55,29 +57,45 @@ const VisualBlockEditor = () => {
     }
   }, []);
 
-  // Update generated code when blocks or language change
   useEffect(() => {
-    const code = generateCode(blocks, selectedLanguage); // pass selectedLanguage
+    const code = generateCode(blocks, selectedLanguage);
     setGeneratedCode(code);
   }, [blocks, selectedLanguage]);
 
   const runCode = async () => {
-  setIsRunning(true);
-  setOutput('Running...');
-  try {
-    const response = await fetch('http://localhost:5000/api/run', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: generatedCode, language: selectedLanguage }),
-    });
-    const data = await response.json();
-    setOutput(data.output);
-  } catch (error) {
-    setOutput(`Error: ${error.message}`);
-  }
-  setIsRunning(false);
-};
+    setIsRunning(true);
+    setOutput('Running...');
+    try {
+      const response = await fetch('http://localhost:5000/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: generatedCode, language: selectedLanguage }),
+      });
+      const data = await response.json();
+      setOutput(data.output);
+    } catch (error) {
+      setOutput(`Error: ${error.message}`);
+    }
+    setIsRunning(false);
+  };
 
+  const saveProject = async () => {
+    if (!projectTitle) {
+      alert('Please enter a project title.');
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('http://localhost:5000/api/projects',{
+        title: projectTitle,code: generatedCode,language: selectedLanguage},{
+        headers: { Authorization: token }
+      });
+      alert('Project saved successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to save project.');
+    }
+  };
 
   return (
     <div className="block-editor">
@@ -87,6 +105,13 @@ const VisualBlockEditor = () => {
         <div className="header">
           <h1>🧩 Block Code Editor</h1>
           <div className="header-buttons">
+            <input
+              type="text"
+              placeholder="Project title"
+              value={projectTitle}
+              onChange={(e) => setProjectTitle(e.target.value)}
+              style={{ padding: '5px', fontSize: '14px' }}
+            />
             <select
               value={selectedLanguage}
               onChange={(e) => setSelectedLanguage(e.target.value)}
@@ -99,18 +124,14 @@ const VisualBlockEditor = () => {
               <option value="c">C</option>
             </select>
 
-            <button 
-              onClick={clearCanvas} 
-              className="btn btn-danger"
-            >
+            <button onClick={clearCanvas} className="btn btn-danger">
               Clear All
             </button>
-            <button 
-              onClick={runCode} 
-              disabled={isRunning}
-              className="btn btn-success"
-            >
+            <button onClick={runCode} disabled={isRunning} className="btn btn-success">
               {isRunning ? '⏳ Running...' : '▶️ Run Code'}
+            </button>
+            <button onClick={saveProject} className="btn btn-primary">
+              💾 Save Project
             </button>
           </div>
         </div>
