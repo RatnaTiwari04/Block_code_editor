@@ -1,0 +1,186 @@
+/* Sidebar container */
+.sidebar {
+  width: 254px;
+  height: 100vh;
+  margin-top: 42px;
+  background-color: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #34495e;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Header styling */
+.sidebar-header {
+  padding: 15px 20px;
+  margin: 0;
+  background-color: #34495e;
+  border-bottom: 1px solid #4a5f7a;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+/* Scrollable container for blocks */
+.blocks-list-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 10px;
+  margin: 10px 0;
+}
+
+/* Custom scrollbar styling */
+.blocks-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.blocks-list-container::-webkit-scrollbar-track {
+  background: #34495e;
+  border-radius: 4px;
+}
+
+.blocks-list-container::-webkit-scrollbar-thumb {
+  background: #5a6c7d;
+  border-radius: 4px;
+}
+
+.blocks-list-container::-webkit-scrollbar-thumb:hover {
+  background: #6c7b8a;
+}
+
+/* Firefox scrollbar styling */
+/* Removed 'scrollbar-color' for better browser compatibility */
+
+/* Blocks list */
+.blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 5px 0;
+}
+
+/* Individual block items */
+.block-item {
+  width: 100%;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.block-item:hover {
+  background-color: #d5dbdb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.block-item:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific block type colors */
+.block-variable {
+  background-color: #3498db;
+  color: white;
+}
+
+.block-variable:hover {
+  background-color: #2980b9;
+}
+
+.block-function {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.block-function:hover {
+  background-color: #27ae60;
+}
+
+.block-if, .block-else_if {
+  background-color: #f39c12;
+  color: white;
+}
+
+.block-if:hover, .block-else_if:hover {
+  background-color: #e67e22;
+}
+
+.block-for_loop, .block-while_loop, .block-do_while_loop, .block-for_each {
+  background-color: #9b59b6;
+  color: white;
+}
+
+.block-for_loop:hover, .block-while_loop:hover, .block-do_while_loop:hover, .block-for_each:hover {
+  background-color: #8e44ad;
+}
+
+.block-math, .block-math_function {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.block-math:hover, .block-math_function:hover {
+  background-color: #c0392b;
+}
+
+/* Usage instructions */
+.usage-instructions {
+  padding: -2px 20px;
+  background-color: #34495e;
+  border-top: 1px solid #4a5f7a;
+  font-size: 12px;
+  color: #bdc3c7;
+  flex-shrink: 0; /* Prevent instructions from shrinking */
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.usage-instructions p {
+  margin: 0 0 10px 0;
+}
+
+.usage-instructions ul {
+  padding-left: 15px;
+  margin: 0;
+  list-style-type: disc;
+}
+
+.usage-instructions li {
+  margin-bottom: 5px;
+  line-height: 1.4;
+}
+
+/* Responsive design */
+@media (max-height: 600px) {
+  .usage-instructions {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 250px;
+  }
+  
+  .block-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}

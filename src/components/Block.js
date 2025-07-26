@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { BLOCK_TYPES } from '../utils/blockTypes';
+import COLORS from '../styles/colors'; // color palette
 
 const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [localData, setLocalData] = useState(block.data || {});
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -10,12 +10,13 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
 
   const blockType = BLOCK_TYPES[block.type];
 
-  const handleMouseDown = useCallback((e) => {
-    // Don't start dragging if clicking on an input field
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-      return;
-    }
+  // 🎨 Assign a random color once on mount
+  const randomColor = useMemo(() => {
+    return COLORS[Math.floor(Math.random() * COLORS.length)];
+  }, []);
 
+  const handleMouseDown = useCallback((e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault();
     e.stopPropagation();
 
@@ -27,21 +28,20 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       x: e.clientX - (rect.left - parentRect.left),
       y: e.clientY - (rect.top - parentRect.top)
     });
-    
+
     onSelect(block.id);
   }, [block.id, onSelect]);
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
-    
     e.preventDefault();
-    
+
     const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
     const newPosition = {
       x: Math.max(0, e.clientX - parentRect.left - dragStart.x),
       y: Math.max(0, e.clientY - parentRect.top - dragStart.y)
     };
-    
+
     onUpdate(block.id, { position: newPosition });
   }, [isDragging, dragStart, block.id, onUpdate]);
 
@@ -53,7 +53,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
-      
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
@@ -67,11 +66,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     onUpdate(block.id, { data: newData });
   }, [localData, block.id, onUpdate]);
 
-  const handleDoubleClick = useCallback((e) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  }, []);
-
   const handleDelete = useCallback((e) => {
     e.stopPropagation();
     onDelete(block.id);
@@ -82,9 +76,7 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     onSelect(block.id);
   }, [block.id, onSelect]);
 
-  if (!blockType) {
-    return null;
-  }
+  if (!blockType) return null;
 
   return (
     <div
@@ -93,22 +85,20 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       style={{
         left: block.position.x,
         top: block.position.y,
-        zIndex: isDragging ? 1000 : isSelected ? 100 : 10
+        zIndex: isDragging ? 1000 : isSelected ? 100 : 10,
+        backgroundColor: randomColor, // ✅ Random background color
       }}
       onMouseDown={handleMouseDown}
-      onDoubleClick={handleDoubleClick}
+      onDoubleClick={(e) => e.stopPropagation()}
       onClick={handleBlockClick}
     >
-      {/* Connection points */}
       {blockType.inputs && blockType.inputs.length > 0 && (
         <div className="connection-input" title="Input connection" />
       )}
-      
       {blockType.outputs && blockType.outputs.length > 0 && (
         <div className="connection-output" title="Output connection" />
       )}
 
-      {/* Block header */}
       <div className="block-header">
         <span className="block-title">
           {blockType.icon} {blockType.label}
@@ -122,7 +112,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         </button>
       </div>
 
-      {/* Block inputs */}
       {blockType.fields && blockType.fields.map((field) => (
         <div key={field.name} className="block-input">
           <label className="block-label">{field.label}:</label>
@@ -148,7 +137,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         </div>
       ))}
 
-      {/* Special message for empty blocks */}
       {(!blockType.fields || blockType.fields.length === 0) && (
         <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
           Double-click to configure

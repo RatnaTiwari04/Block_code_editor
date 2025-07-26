@@ -3,43 +3,49 @@ export const generateCode = (blocks, selectedLanguage = 'javascript') => {
     return '// Drag blocks from the sidebar to start coding!\n// Double-click blocks to edit their properties';
   }
 
-  let codeHeader = {
+  const isJavaLike = ['java', 'cpp', 'c'].includes(selectedLanguage);
+
+  let code = '';
+  let mainBody = '';
+  let otherMethods = '';
+  const codeHeader = {
     javascript: '// Generated JavaScript code from visual blocks\n\n',
     python: '# Generated Python code from visual blocks\n\n',
-    java: '// Generated Java code from visual blocks\n\npublic class Main {\n  public static void main(String[] args) {\n',
-    cpp: '// Generated C++ code from visual blocks\n\n#include <iostream>\nusing namespace std;\n\nint main() {\n',
-    c: '// Generated C code from visual blocks\n\n#include <stdio.h>\n\nint main() {\n'
+    java: '// Generated Java code from visual blocks\n\n',
+    cpp: '// Generated C++ code from visual blocks\n\n#include <iostream>\nusing namespace std;\n\n',
+    c: '// Generated C code from visual blocks\n\n#include <stdio.h>\n\n'
   }[selectedLanguage] || '';
 
-  let code = codeHeader;
-
-  // Sort blocks by vertical position to keep logical order
+  code += codeHeader;
   const sortedBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y);
 
   sortedBlocks.forEach((block, index) => {
     const blockCode = generateBlockCode(block, selectedLanguage);
-    if (blockCode.trim()) {
-      // For Java/C/C++, indent inside main()
-      if (['java', 'cpp', 'c'].includes(selectedLanguage)) {
-        code += blockCode
-          .split('\n')
-          .map(line => line.trim() ? `  ${line}` : line)
-          .join('\n') + '\n';
-      } else {
-        code += blockCode + '\n';
-      }
-      if (index < sortedBlocks.length - 1) {
-        code += '\n';
-      }
+    if (!blockCode.trim()) return;
+
+    if (selectedLanguage === 'java' && block.type === 'FUNCTION') {
+      otherMethods += blockCode + '\n\n';
+    } else if (isJavaLike) {
+      mainBody += blockCode
+        .split('\n')
+        .map(line => line.trim() ? '    ' + line : line)
+        .join('\n') + '\n\n';
+    } else {
+      code += blockCode + '\n\n';
     }
   });
-
-  // Close main method for Java/C/C++
-  if (selectedLanguage === 'java' || selectedLanguage === 'cpp' || selectedLanguage === 'c') {
-    code += '  return 0;\n}\n';
-    if (selectedLanguage === 'java') {
-      code += '}';
-    }
+  if (selectedLanguage === 'java') {
+    code += 'public class Main {\n\n';
+    code += '  public static void main(String[] args) {\n';
+    code += mainBody.trim() + '\n';
+    code += '  }\n\n';
+    code += otherMethods.trim() + '\n';
+    code += '}';
+  } else if (selectedLanguage === 'cpp' || selectedLanguage === 'c') {
+    code += 'int main() {\n';
+    code += mainBody.trim() + '\n';
+    code += '  return 0;\n';
+    code += '}\n';
   }
 
   return code;
