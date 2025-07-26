@@ -94,6 +94,18 @@ const generateBlockCode = (block, lang) => {
       return generateIncrementCode(data,lang);
     case 'DECREMENT':
       return generateDecrementCode(data,lang);
+    case 'COMPARISON':
+      return generateComparisonCode(data,lang);
+    case 'LOGICAL':
+      return generateLogicalCode(data,lang);
+    case 'STRING_CONCAT':
+      return generateStringConcatCode(data,lang);
+    case 'STRING_LENGTH':
+      return generateStringLengthCode(data,lang);
+    case 'SUBSTRING':
+      return generateSubstringCode(data,lang);
+    case 'ARRAY_LENGTH':
+      return generateArrayLengthCode(data,lang);
     case 'INPUT':
       return generateInputCode(data, lang);
     case 'COMMENT':
@@ -614,6 +626,104 @@ const generateDecrementCode = (data, lang) => {
       return `${variable}--;`;
   }
 };
+const generateComparisonCode = (data, lang) => {
+  const left = data.left || 'a';
+  const operator = data.operator || '==';
+  const right = data.right || 'b';
+
+  let validOp = operator;
+  if (lang === 'python' && (operator === '===' || operator === '!==')) {
+    validOp = operator === '===' ? '==' : '!=';
+  }
+
+  return `${left} ${validOp} ${right}`;
+};
+const generateLogicalCode = (data, lang) => {
+  const left = data.left || 'true';
+  const operator = data.operator || '&&';
+  const right = data.right || 'false';
+
+  if (operator === '!') {
+    return `${operator}${left}`;
+  }
+
+  return `${left} ${operator} ${right}`;
+};
+const generateStringConcatCode = (data, lang) => {
+  const left = data.left || '"Hello"';
+  const right = data.right || '"World"';
+  const result = data.result || 'result';
+
+  switch (lang) {
+    case 'python':
+      return `${result} = ${left} + ${right}`;
+    case 'java':
+      return `String ${result} = ${left} + ${right};`;
+    case 'cpp':
+    case 'c':
+      return `// String concat not directly supported in C. Use sprintf or strcat.\nchar ${result}[100];\nsprintf(${result}, "%s%s", ${left}, ${right});`;
+    case 'javascript':
+    default:
+      return `let ${result} = ${left} + ${right};`;
+  }
+};
+const generateStringLengthCode = (data, lang) => {
+  const str = data.string || 'myString';
+  const result = data.result || 'length';
+
+  switch (lang) {
+    case 'python':
+      return `${result} = len(${str})`;
+    case 'java':
+      return `int ${result} = ${str}.length();`;
+    case 'cpp':
+      return `int ${result} = ${str}.length();`;
+    case 'c':
+      return `int ${result} = strlen(${str});`;
+    case 'javascript':
+    default:
+      return `let ${result} = ${str}.length;`;
+  }
+};
+const generateSubstringCode = (data, lang) => {
+  const str = data.string || 'myString';
+  const start = data.start || 0;
+  const end = data.end || 5;
+  const result = data.result || 'result';
+
+  switch (lang) {
+    case 'python':
+      return `${result} = ${str}[${start}:${end}]`;
+    case 'java':
+      return `String ${result} = ${str}.substring(${start}, ${end});`;
+    case 'cpp':
+      return `std::string ${result} = ${str}.substr(${start}, ${end - start});`;
+    case 'c':
+      return `// C does not have built-in substring. Use strncpy or manual loop.`;
+    case 'javascript':
+    default:
+      return `let ${result} = ${str}.substring(${start}, ${end});`;
+  }
+};
+const generateArrayLengthCode = (data, lang) => {
+  const array = data.array || 'myArray';
+  const result = data.result || 'length';
+
+  switch (lang) {
+    case 'python':
+      return `${result} = len(${array})`;
+    case 'java':
+      return `int ${result} = ${array}.length;`;
+    case 'cpp':
+      return `int ${result} = sizeof(${array}) / sizeof(${array}[0]);`;
+    case 'c':
+      return `int ${result} = sizeof(${array}) / sizeof(${array}[0]);`;
+    case 'javascript':
+    default:
+      return `let ${result} = ${array}.length;`;
+  }
+};
+
 const generateInputCode = (data, lang) => {
   const promptText = data.prompt || 'Enter a value:';
   const variable = data.variable || 'userInput';
