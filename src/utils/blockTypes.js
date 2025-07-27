@@ -1,5 +1,4 @@
 export const BLOCK_TYPES = {
-  // Variables & Data Types
   VARIABLE: {
     id: 'variable',
     label: 'Variable',
@@ -22,7 +21,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   CONSTANT: {
     id: 'constant',
     label: 'Constant',
@@ -45,8 +43,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Data Types
   NUMBER: {
     id: 'number',
     label: 'Number',
@@ -63,42 +59,51 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   STRING: {
-    id: 'string',
-    label: 'String',
-    icon: '📝',
-    description: 'Create a text string',
-    inputs: [],
-    outputs: ['value'],
-    fields: [
-      {
-        name: 'value',
-        label: 'Text Value',
-        type: 'text',
-        placeholder: 'Hello World'
-      }
-    ]
-  },
-
+  id: 'string',
+  label: 'String',
+  icon: '📝',
+  description: 'Create a text string',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myString'
+    },
+    {
+      name: 'value',
+      label: 'Text Value',
+      type: 'text',
+      placeholder: 'Hello World'
+    }
+  ]
+},
   BOOLEAN: {
-    id: 'boolean',
-    label: 'Boolean',
-    icon: '✅',
-    description: 'Create a true/false value',
-    inputs: [],
-    outputs: ['value'],
-    fields: [
-      {
-        name: 'value',
-        label: 'Boolean Value',
-        type: 'select',
-        options: ['true', 'false'],
-        placeholder: 'true'
-      }
-    ]
-  },
-
+  id: 'boolean',
+  label: 'Boolean',
+  icon: '✅',
+  description: 'Create a true/false value',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myBool'
+    },
+    {
+      name: 'value',
+      label: 'Boolean Value',
+      type: 'select',
+      options: ['true', 'false'],
+      placeholder: 'true'
+    }
+  ]
+},
   ARRAY: {
     id: 'array',
     label: 'Array',
@@ -144,8 +149,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Functions
   FUNCTION: {
     id: 'function',
     label: 'Function',
@@ -174,7 +177,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   FUNCTION_CALL: {
     id: 'function_call',
     label: 'Function Call',
@@ -197,7 +199,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   RETURN: {
     id: 'return',
     label: 'Return',
@@ -214,8 +215,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Control Flow
   IF: {
     id: 'if',
     label: 'If Statement',
@@ -244,7 +243,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   ELSE_IF: {
     id: 'else_if',
     label: 'Else If',
@@ -267,7 +265,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   SWITCH: {
     id: 'switch',
     label: 'Switch Statement',
@@ -296,8 +293,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Loops
   LOOP: {
     id: 'for_loop',
     label: 'For Loop',
@@ -338,7 +333,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   WHILE_LOOP: {
     id: 'while_loop',
     label: 'While Loop',
@@ -361,7 +355,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   DO_WHILE_LOOP: {
     id: 'do_while_loop',
     label: 'Do-While Loop',
@@ -384,7 +377,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   FOR_EACH: {
     id: 'for_each',
     label: 'For Each',
@@ -434,7 +426,6 @@ export const BLOCK_TYPES = {
     fields: []
   },
 
-  // Mathematical Operations
   MATH: {
     id: 'math',
     label: 'Math Operation',
@@ -534,8 +525,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Comparison & Logic
   COMPARISON: {
     id: 'comparison',
     label: 'Comparison',
@@ -565,7 +554,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   LOGICAL: {
     id: 'logical',
     label: 'Logical Operation',
@@ -595,8 +583,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // String Operations
   STRING_CONCAT: {
     id: 'string_concat',
     label: 'String Concatenation',
@@ -625,7 +611,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   STRING_LENGTH: {
     id: 'string_length',
     label: 'String Length',
@@ -648,7 +633,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
   SUBSTRING: {
     id: 'substring',
     label: 'Substring',
@@ -683,8 +667,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Array Operations
   ARRAY_LENGTH: {
     id: 'array_length',
     label: 'Array Length',
@@ -1027,8 +1009,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-
-  // Random
   RANDOM: {
     id: 'random',
     label: 'Random Number',
