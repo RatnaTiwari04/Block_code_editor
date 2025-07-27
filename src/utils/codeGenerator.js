@@ -148,23 +148,30 @@ const generateBlockCode = (block, lang) => {
       return `// Unknown block type: ${block.type}`;
   }
 };
-
 const generateVariableCode = (data, lang) => {
   const name = data.name || 'myVariable';
   const value = data.value || '0';
-  const isString = isNaN(value) && !value.includes('"') && !value.includes("'") && isNaN(parseFloat(value));
-  const formattedValue = isString ? `"${value}"` : value;
+  const isInteger = Number.isInteger(Number(value));
+  const formattedValue = isInteger ? value : `"${value}"`; 
 
   switch (lang) {
     case 'python':
       return `${name} = ${formattedValue}`;
     case 'java':
-      return `int ${name} = ${formattedValue};`;
+      if (isInteger) {
+        return `int ${name} = ${formattedValue};`;
+      } else {
+        return `// Invalid assignment for type 'int'. Only integer values are allowed for 'int'.`;
+      }
     case 'cpp':
     case 'c':
-      return `int ${name} = ${formattedValue};`;
+      if (isInteger) {
+        return `int ${name} = ${formattedValue};`;
+      } else {
+        return `// Invalid assignment for type 'int'. Only integer values are allowed for 'int'.`;
+      }
     default:
-      return `let ${name} = ${formattedValue};`;
+      return `let ${name} = ${formattedValue};`; 
   }
 };
 const generateStringCode = (data, lang) => {
