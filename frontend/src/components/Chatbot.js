@@ -1,6 +1,13 @@
-// Chatbot.js
 import React, { useState, useRef, useEffect } from 'react';
 import './Chatbot.css';
+
+// Gemini API configuration - Updated to use environment variable for Create React App
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+// Debug logging (remove in production)
+console.log('API Key loaded:', GEMINI_API_KEY ? 'Yes' : 'No');
+console.log('API Key (first 10 chars):', GEMINI_API_KEY?.substring(0, 10));
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,22 +53,93 @@ const Chatbot = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue.trim();
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const botResponse = generateResponse(userMessage.content.toLowerCase());
+    try {
+      // Call Gemini API
+      const response = await callGeminiAPI(currentInput);
       const botMessage = {
         id: Date.now() + 1,
-        content: botResponse,
+        content: response,
         sender: 'bot',
         timestamp: new Date()
       };
       
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error calling Gemini API:', error);
+      const errorMessage = {
+        id: Date.now() + 1,
+        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    }
+  };
+
+  const callGeminiAPI = async (message) => {
+    // Check if API key exists
+    if (!GEMINI_API_KEY) {
+      throw new Error('Gemini API key not found. Please check your .env file and ensure REACT_APP_GEMINI_API_KEY is set.');
+    }
+
+    const systemPrompt = `You are a helpful AI assistant for a block-based code editor (similar to Scratch). You help users understand:
+    - How to use visual programming blocks
+    - Code generation from blocks
+    - Programming concepts in JavaScript, Python, Java, C++, and C
+    - Debugging and troubleshooting
+    - Best practices in programming
+    
+    The editor allows users to drag blocks to build programs visually. Be concise, helpful, and focus on practical coding assistance. If asked about blocks, assume they're visual programming elements.`;
+
+    const requestBody = {
+      contents: [{
+        parts: [{
+          text: `${systemPrompt}\n\nUser question: ${message}`
+        }]
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1024,
+      }
+    };
+
+    console.log('Making API request to:', GEMINI_API_URL);
+    console.log('Request body:', JSON.stringify(requestBody, null, 2));
+
+    const response = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    console.log('API Response status:', response.status);
+    console.log('API Response headers:', response.headers);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('API Response data:', data);
+    
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      return data.candidates[0].content.parts[0].text;
+    } else {
+      console.error('Invalid response format:', data);
+      throw new Error('Invalid response format from Gemini API');
+    }
   };
 
   const generateResponse = (message) => {
