@@ -838,7 +838,7 @@ export const BLOCK_TYPES = {
 
   PRINT: {
     id: 'print',
-    label: 'Console Log',
+    label: 'Print',
     icon: '🖨️',
     description: 'Print output to console',
     inputs: ['value'],

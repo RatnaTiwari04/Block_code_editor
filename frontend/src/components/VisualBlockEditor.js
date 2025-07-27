@@ -97,7 +97,7 @@ const VisualBlockEditor = () => {
       alert('Project saved successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save project.');
+      alert('Failed to save project.Please Login First');
     }
   };
 

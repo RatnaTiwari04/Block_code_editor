@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import './Dashboard.css'; // Import the CSS file
+
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const user = JSON.parse(localStorage.getItem('user'));
+
   useEffect(() => {
     const loadProjects = async () => {
       try {
@@ -13,48 +18,148 @@ const Dashboard = () => {
         setProjects(res.data.projects);
       } catch (err) {
         console.error(err);
+        setError('Failed to load projects. Please try again.');
+      } finally {
+        setLoading(false);
       }
     };
     loadProjects();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
+
+  const getLanguageIcon = (language) => {
+    const icons = {
+      javascript: '🟨',
+      python: '🐍',
+      java: '☕',
+      cpp: '⚡',
+      html: '🌐',
+      css: '🎨',
+      react: '⚛️',
+      node: '🟢',
+      default: '📄'
+    };
+    return icons[language?.toLowerCase()] || icons.default;
+  };
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>👤 My Profile</h2>
-      {user ? (
-        <div style={{
-          border: '1px solid #ddd', 
-          borderRadius: '6px', 
-          padding: '10px', 
-          marginBottom: '20px',
-          background: '#f9f9f9'
-        }}>
-          <p><b>Name:</b> {user.name}</p>
-          <p><b>Email:</b> {user.email}</p>
-        </div>):(
-        <p>User info not available. Please login again.</p>)}
-      <h2>📂 My Projects</h2>
-      {projects.length > 0 ? (
-        projects.map(p => (
-          <div 
-            key={p._id} 
-            style={{ 
-              border: '1px solid #ccc', 
-              borderRadius: '6px',
-              margin: '8px 0', 
-              padding: '10px',
-              background: '#fff'
-            }}>
-            <b>{p.title}</b> <small>({p.language})</small>
-            <pre style={{
-              background: '#f4f4f4',
-              padding: '10px',
-              borderRadius: '4px',
-              overflowX: 'auto'
-            }}>{p.code}</pre>
+    <div className="dashboard-container">
+      {/* Header */}
+      <header className="dashboard-header">
+        <div className="header-content">
+          <h1 className="dashboard-title">
+            <span className="title-icon">🚀</span>
+            My Dashboard
+          </h1>
+          <button onClick={handleLogout} className="logout-button">
+            <span className="logout-icon">👋</span>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <div className="dashboard-content">
+        {/* Profile Section */}
+        <section className="profile-section">
+          <div className="section-header">
+            <h2 className="section-title">
+              <span className="section-icon">👤</span>
+              My Profile
+            </h2>
           </div>
-        ))):(
-        <p>No projects found.</p>)}
+          
+          {user ? (
+            <div className="profile-card">
+              <div className="profile-avatar">
+                {user.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div className="profile-info">
+                <div className="profile-field">
+                  <span className="field-label">Name:</span>
+                  <span className="field-value">{user.name}</span>
+                </div>
+                <div className="profile-field">
+                  <span className="field-label">Email:</span>
+                  <span className="field-value">{user.email}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              User info not available. Please login again.
+            </div>
+          )}
+        </section>
+
+        {/* Projects Section */}
+        <section className="projects-section">
+          <div className="section-header">
+            <h2 className="section-title">
+              <span className="section-icon">📂</span>
+              My Projects
+              <span className="project-count">({projects.length})</span>
+            </h2>
+          </div>
+
+          {loading ? (
+            <div className="loading-container">
+              <div className="spinner-large"></div>
+              <p>Loading your projects...</p>
+            </div>
+          ) : error ? (
+            <div className="error-message">
+              <span className="error-icon">❌</span>
+              {error}
+            </div>
+          ) : projects.length > 0 ? (
+            <div className="projects-grid">
+              {projects.map(project => (
+                <div key={project._id} className="project-card">
+                  <div className="project-header">
+                    <div className="project-title-section">
+                      <span className="language-icon">
+                        {getLanguageIcon(project.language)}
+                      </span>
+                      <h3 className="project-title">{project.title}</h3>
+                    </div>
+                    <span className="language-badge">{project.language}</span>
+                  </div>
+                  
+                  <div className="project-code">
+                    <div className="code-header">
+                      <span className="code-label">Code:</span>
+                      <button 
+                        className="copy-button"
+                        onClick={() => navigator.clipboard.writeText(project.code)}
+                        title="Copy code"
+                      >
+                        📋
+                      </button>
+                    </div>
+                    <pre className="code-block">
+                      <code>{project.code}</code>
+                    </pre>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">📭</div>
+              <h3>No projects found</h3>
+              <p>You haven't created any projects yet. Start coding to see them here!</p>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 };
+
 export default Dashboard;
