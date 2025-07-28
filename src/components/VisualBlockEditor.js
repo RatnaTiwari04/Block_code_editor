@@ -49,6 +49,8 @@ const VisualBlockEditor = () => {
   const clearCanvas = useCallback(() => {
     setBlocks([]);
     setSelectedBlock(null);
+    setGeneratedCode('// Drag blocks from the sidebar to start coding!');
+    setOutput('Click "Run Code" to see output...');
   }, []);
 
   const handleCanvasClick = useCallback((e) => {

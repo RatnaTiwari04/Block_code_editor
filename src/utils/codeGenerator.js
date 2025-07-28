@@ -356,12 +356,10 @@ const generateElseIfCode = (data, lang) => {
     case 'java':
     case 'cpp':
     case 'c':
-      // else if with braces and semicolon inside
       return `else if (${condition}) {\n${indentedThen}\n}`;
 
     case 'javascript':
     default:
-      // JS else if same as C-like
       return `else if (${condition}) {\n${indentedThen}\n}`;
   }
 };
@@ -373,23 +371,18 @@ const generateSwitchCode = (data, lang) => {
   try {
     casesJson = JSON.parse(data.cases || '{}');
   } catch {
-    // invalid JSON fallback
     casesJson = {};
   }
   const defaultCase = data.default || '';
-
-  // Helper to indent code lines
   const indentLines = (code, indent = '  ') => 
     code.split('\n').map(line => line.trim() ? indent + line : line).join('\n');
 
   switch (lang) {
     case 'python':
-      // Python uses if-elif-else for switch
       const casesPython = Object.entries(casesJson).map(([caseKey, code]) =>
         `elif ${value} == ${caseKey}:\n${indentLines(code || 'pass', '  ')}`
       ).join('\n');
       const defaultPython = defaultCase ? `else:\n${indentLines(defaultCase, '  ')}` : '';
-      // first case must be 'if' not 'elif', so fix that if any cases exist
       const pythonSwitch = casesPython.length > 0
         ? `if ${value} == ${Object.entries(casesJson)[0][0]}:\n${indentLines(Object.entries(casesJson)[0][1] || 'pass', '  ')}\n` +
           Object.entries(casesJson).slice(1).map(([caseKey, code]) =>
@@ -404,16 +397,13 @@ const generateSwitchCode = (data, lang) => {
     case 'c':
     case 'javascript':
     default:
-      // C-style switch with cases and default, indented and semicolon-terminated lines
       const casesStr = Object.entries(casesJson).map(([caseKey, code]) => {
         const indentedCode = indentLines(code || '', '    ');
         return `case ${caseKey}:\n${indentedCode}\n    break;`;
       }).join('\n');
-
       const defaultStr = defaultCase
         ? `default:\n${indentLines(defaultCase, '    ')}\n    break;`
         : '';
-
       return `switch (${value}) {\n${casesStr}\n${defaultStr}\n}`;
   }
 };
@@ -436,12 +426,10 @@ const generatePrintCode = (data, lang) => {
   const value = data.value || '"Hello World!"';
   const isVariable = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(value.trim());
   const isAlreadyQuoted = value.includes('"') || value.includes("'");
-
   let formattedValue = value;
   if (!isVariable && !isAlreadyQuoted && isNaN(value)) {
     formattedValue = `"${value}"`;
   }
-
   switch (lang) {
     case 'python':
       return `print(${formattedValue})`;
@@ -560,8 +548,6 @@ const generateMathFunctionCode = (data, lang) => {
   const func = data.function || 'abs';
   const value = data.value || '0';
   const result = data.result || 'result';
-
-  // Mapping function names for different languages if needed
   const funcMap = {
     python: {
       abs: 'abs',
@@ -574,7 +560,7 @@ const generateMathFunctionCode = (data, lang) => {
       cos: 'math.cos',
       tan: 'math.tan',
       log: 'math.log',
-      random: 'random.random()'  // random() doesn't take input
+      random: 'random.random()'
     },
     java: {
       abs: 'Math.abs',
@@ -587,7 +573,7 @@ const generateMathFunctionCode = (data, lang) => {
       cos: 'Math.cos',
       tan: 'Math.tan',
       log: 'Math.log',
-      random: 'Math.random()' // no input
+      random: 'Math.random()'
     },
     cpp: {
       abs: 'abs',
@@ -600,7 +586,7 @@ const generateMathFunctionCode = (data, lang) => {
       cos: 'cos',
       tan: 'tan',
       log: 'log',
-      random: '((double)rand() / RAND_MAX)' // no input
+      random: '((double)rand() / RAND_MAX)'
     },
     c: {
       abs: 'abs',
@@ -613,7 +599,7 @@ const generateMathFunctionCode = (data, lang) => {
       cos: 'cos',
       tan: 'tan',
       log: 'log',
-      random: '((double)rand() / RAND_MAX)' // no input
+      random: '((double)rand() / RAND_MAX)'
     },
     javascript: {
       abs: 'Math.abs',
@@ -626,13 +612,10 @@ const generateMathFunctionCode = (data, lang) => {
       cos: 'Math.cos',
       tan: 'Math.tan',
       log: 'Math.log',
-      random: 'Math.random()' // no input
+      random: 'Math.random()'
     }
   };
-
   const mappedFunc = (funcMap[lang] && funcMap[lang][func]) || func;
-
-  // Special handling for functions with no input argument e.g. random
   if (func === 'random') {
     switch (lang) {
       case 'python':
@@ -645,7 +628,6 @@ const generateMathFunctionCode = (data, lang) => {
         return `${result} = ${mappedFunc};`;
     }
   }
-
   switch (lang) {
     case 'python':
       return `${result} = ${mappedFunc}(${value})`;
@@ -657,11 +639,8 @@ const generateMathFunctionCode = (data, lang) => {
       return `${result} = ${mappedFunc}(${value});`;
   }
 };
-
-
 const generateIncrementCode = (data, lang) => {
   const variable = data.variable || 'counter';
-
   switch (lang) {
     case 'python':
       return `${variable} += 1`;
@@ -673,10 +652,8 @@ const generateIncrementCode = (data, lang) => {
       return `${variable}++;`;
   }
 };
-
 const generateDecrementCode = (data, lang) => {
   const variable = data.variable || 'counter';
-
   switch (lang) {
     case 'python':
       return `${variable} -= 1`;
@@ -692,30 +669,25 @@ const generateComparisonCode = (data, lang) => {
   const left = data.left || 'a';
   const operator = data.operator || '==';
   const right = data.right || 'b';
-
   let validOp = operator;
   if (lang === 'python' && (operator === '===' || operator === '!==')) {
     validOp = operator === '===' ? '==' : '!=';
   }
-
   return `${left} ${validOp} ${right}`;
 };
 const generateLogicalCode = (data, lang) => {
   const left = data.left || 'true';
   const operator = data.operator || '&&';
   const right = data.right || 'false';
-
   if (operator === '!') {
     return `${operator}${left}`;
   }
-
   return `${left} ${operator} ${right}`;
 };
 const generateStringConcatCode = (data, lang) => {
   const left = data.left || '"Hello"';
   const right = data.right || '"World"';
   const result = data.result || 'result';
-
   switch (lang) {
     case 'python':
       return `${result} = ${left} + ${right}`;
@@ -732,7 +704,6 @@ const generateStringConcatCode = (data, lang) => {
 const generateStringLengthCode = (data, lang) => {
   const str = data.string || 'myString';
   const result = data.result || 'length';
-
   switch (lang) {
     case 'python':
       return `${result} = len(${str})`;
@@ -752,7 +723,6 @@ const generateSubstringCode = (data, lang) => {
   const start = data.start || 0;
   const end = data.end || 5;
   const result = data.result || 'result';
-
   switch (lang) {
     case 'python':
       return `${result} = ${str}[${start}:${end}]`;
@@ -770,7 +740,6 @@ const generateSubstringCode = (data, lang) => {
 const generateArrayLengthCode = (data, lang) => {
   const array = data.array || 'myArray';
   const result = data.result || 'length';
-
   switch (lang) {
     case 'python':
       return `${result} = len(${array})`;
@@ -786,83 +755,80 @@ const generateArrayLengthCode = (data, lang) => {
   }
 };
 const generateArrayPushCode = (data, lang) => {
-  const arrayName = data.array || 'myArray'; // Default array name
-  const value = data.value || 'newValue'; // Default value to add
+  const arrayName = data.array || 'myArray';
+  const value = data.value || 'newValue';
 
   switch (lang) {
     case 'python':
-      return `${arrayName}.append(${value})`; // Python: append to list
+      return `${arrayName}.append(${value})`;
     case 'java':
-      return `${arrayName}.add(${value});`; // Java: add to ArrayList
+      return `${arrayName}.add(${value});`;
     case 'cpp':
     case 'c':
-      return `${arrayName}.push_back(${value});`; // C++: push to vector
+      return `${arrayName}.push_back(${value});`;
     default:
-      return `${arrayName}.push(${value});`; // JavaScript: push to array
+      return `${arrayName}.push(${value});`;
   }
 };
 const generateArrayPopCode = (data, lang) => {
-  const arrayName = data.array || 'myArray'; // Default array name
-  const resultName = data.result || 'removedValue'; // Default variable to store popped value
+  const arrayName = data.array || 'myArray';
+  const resultName = data.result || 'removedValue';
 
   switch (lang) {
     case 'python':
-      return `${resultName} = ${arrayName}.pop()`; // Python: pop from list
+      return `${resultName} = ${arrayName}.pop()`;
     case 'java':
-      return `${resultName} = ${arrayName}.remove(${arrayName}.size() - 1);`; // Java: remove last element from ArrayList
+      return `${resultName} = ${arrayName}.remove(${arrayName}.size() - 1);`;
     case 'cpp':
     case 'c':
-      return `auto ${resultName} = ${arrayName}.back(); ${arrayName}.pop_back();`; // C++: pop from vector
+      return `auto ${resultName} = ${arrayName}.back(); ${arrayName}.pop_back();`;
     default:
-      return `let ${resultName} = ${arrayName}.pop();`; // JavaScript: pop from array
+      return `let ${resultName} = ${arrayName}.pop();`;
   }
 };
 const generateArrayGetCode = (data, lang) => {
-  const arrayName = data.array || 'myArray'; // Default array name
-  const index = data.index || 0; // Default index is 0
-  const resultName = data.result || 'value'; // Default variable to store the fetched value
-
+  const arrayName = data.array || 'myArray';
+  const index = data.index || 0;
+  const resultName = data.result || 'value';
   switch (lang) {
     case 'python':
-      return `${resultName} = ${arrayName}[${index}]`; // Python: access list by index
+      return `${resultName} = ${arrayName}[${index}]`;
     case 'java':
-      return `${resultName} = ${arrayName}.get(${index});`; // Java: access ArrayList by index
+      return `${resultName} = ${arrayName}.get(${index});`;
     case 'cpp':
     case 'c':
-      return `auto ${resultName} = ${arrayName}[${index}];`; // C++: access vector by index
+      return `auto ${resultName} = ${arrayName}[${index}];`;
     default:
-      return `let ${resultName} = ${arrayName}[${index}];`; // JavaScript: access array by index
+      return `let ${resultName} = ${arrayName}[${index}];`;
   }
 };
 const generateArraySetCode = (data, lang) => {
-  const arrayName = data.array || 'myArray'; // Default array name
-  const index = data.index || 0; // Default index is 0
-  const value = data.value || 'newValue'; // Default value to set
-
+  const arrayName = data.array || 'myArray';
+  const index = data.index || 0;
+  const value = data.value || 'newValue';
   switch (lang) {
     case 'python':
-      return `${arrayName}[${index}] = ${value}`; // Python: set list element by index
+      return `${arrayName}[${index}] = ${value}`;
     case 'java':
-      return `${arrayName}.set(${index}, ${value});`; // Java: set ArrayList element by index
+      return `${arrayName}.set(${index}, ${value});`;
     case 'cpp':
     case 'c':
-      return `${arrayName}[${index}] = ${value};`; // C++: set vector element by index
+      return `${arrayName}[${index}] = ${value};`;
     default:
-      return `${arrayName}[${index}] = ${value};`; // JavaScript: set array element by index
+      return `${arrayName}[${index}] = ${value};`;
   }
 };
 const generateInputCode = (data, lang) => {
-  const promptMessage = data.prompt || 'Enter your input:'; // Default prompt message
-  const variableName = data.variable || 'userInput'; // Default variable name
-
+  const promptMessage = data.prompt || 'Enter your input:';
+  const variableName = data.variable || 'userInput';
   switch (lang) {
     case 'python':
-      return `${variableName} = input("${promptMessage}")`; // Python: get input using input()
+      return `${variableName} = input("${promptMessage}")`;
     case 'java':
-      return `Scanner scanner = new Scanner(System.in);\n${variableName} = scanner.nextLine();`; // Java: use Scanner to get input
+      return `Scanner scanner = new Scanner(System.in);\n${variableName} = scanner.nextLine();`;
     case 'cpp':
     case 'c':
-      return `#include <iostream>\n#include <string>\nstd::string ${variableName};\nstd::cout << "${promptMessage}";\nstd::getline(std::cin, ${variableName});`; // C++: use getline for input
+      return `#include <iostream>\n#include <string>\nstd::string ${variableName};\nstd::cout << "${promptMessage}";\nstd::getline(std::cin, ${variableName});`;
     default:
       return `let ${variableName} = prompt("${promptMessage}");`;
   }
@@ -872,20 +838,19 @@ const generateAlertCode = (data, lang) => {
 
   switch (lang) {
     case 'python':
-      return `print("${message}")`; // Python: print message
+      return `print("${message}")`;
     case 'java':
-      return `JOptionPane.showMessageDialog(null, "${message}");`; // Java: show message dialog
+      return `JOptionPane.showMessageDialog(null, "${message}");`;
     case 'cpp':
-      return `std::cout << "${message}" << std::endl;`; // C++: print message to console
+      return `std::cout << "${message}" << std::endl;`;
     default:
-      return `alert("${message}");`; // JavaScript: show alert
+      return `alert("${message}");`;
   }
 };
 const generateTryCatchCode = (data, lang) => {
   const tryBlock = data.try || 'risky code here';
   const catchBlock = data.catch || 'handle error here';
-  const finallyBlock = data.finally || ''; // Finally block is optional
-
+  const finallyBlock = data.finally || '';
   switch (lang) {
     case 'python':
       return `try:\n  ${tryBlock}\nexcept Exception as e:\n  ${catchBlock}\nfinally:\n  ${finallyBlock}`;
@@ -903,45 +868,44 @@ const generateThrowCode = (data, lang) => {
 
   switch (lang) {
     case 'python':
-      return `raise Exception("${message}")`; // Python: raise an exception
+      return `raise Exception("${message}")`;
     case 'java':
-      return `throw new Exception("${message}");`; // Java: throw an exception
+      return `throw new Exception("${message}");`;
     case 'cpp':
     case 'c':
-      return `throw std::runtime_error("${message}");`; // C++: throw runtime error
+      return `throw std::runtime_error("${message}");`;
     default:
-      return `throw new Error("${message}");`; // JavaScript: throw an error
+      return `throw new Error("${message}");`;
   }
 };
 const generateDelayCode = (data, lang) => {
-  const duration = data.duration || 1000; // Default to 1000ms
+  const duration = data.duration || 1000;
 
   switch (lang) {
     case 'python':
-      return `import time\n time.sleep(${duration / 1000})`; // Python: sleep for duration (converted to seconds)
+      return `import time\n time.sleep(${duration / 1000})`;
     case 'java':
-      return `Thread.sleep(${duration});`; // Java: sleep for duration in milliseconds
+      return `Thread.sleep(${duration});`;
     case 'cpp':
     case 'c':
-      return `#include <chrono>\n#include <thread>\nstd::this_thread::sleep_for(std::chrono::milliseconds(${duration}));`; // C++: sleep for duration
+      return `#include <chrono>\n#include <thread>\nstd::this_thread::sleep_for(std::chrono::milliseconds(${duration}));`;
     default:
-      return `setTimeout(() => {}, ${duration});`; // JavaScript: wait using setTimeout
+      return `setTimeout(() => {}, ${duration});`;
   }
 };
 const generateTimerCode = (data, lang) => {
-  const duration = data.duration || 1000; // Default to 1000ms
+  const duration = data.duration || 1000;
   const callback = data.callback || 'console.log("Timer finished");';
-
   switch (lang) {
     case 'python':
-      return `import time\n time.sleep(${duration / 1000})\n${callback}`; // Python: wait for duration and execute code
+      return `import time\n time.sleep(${duration / 1000})\n${callback}`;
     case 'java':
-      return `new java.util.Timer().schedule(new java.util.TimerTask() {\n  public void run() {\n    ${callback}\n  }\n}, ${duration});`; // Java: use Timer to execute code
+      return `new java.util.Timer().schedule(new java.util.TimerTask() {\n  public void run() {\n    ${callback}\n  }\n}, ${duration});`;
     case 'cpp':
     case 'c':
-      return `std::this_thread::sleep_for(std::chrono::milliseconds(${duration}));\n${callback}`; // C++: sleep and execute callback
+      return `std::this_thread::sleep_for(std::chrono::milliseconds(${duration}));\n${callback}`;
     default:
-      return `setTimeout(() => { ${callback} }, ${duration});`; // JavaScript: execute code after delay
+      return `setTimeout(() => { ${callback} }, ${duration});`;
   }
 };
 const generateToStringCode = (data, lang) => {
@@ -950,63 +914,62 @@ const generateToStringCode = (data, lang) => {
 
   switch (lang) {
     case 'python':
-      return `${result} = str(${value})`; // Python: convert to string using str()
+      return `${result} = str(${value})`;
     case 'java':
-      return `${result} = String.valueOf(${value});`; // Java: convert to string using String.valueOf()
+      return `${result} = String.valueOf(${value});`;
     case 'cpp':
     case 'c':
-      return `std::string ${result} = std::to_string(${value});`; // C++: convert to string using to_string()
+      return `std::string ${result} = std::to_string(${value});`;
     default:
-      return `let ${result} = String(${value});`; // JavaScript: convert to string using String()
+      return `let ${result} = String(${value});`;
   }
 };
 const generateToNumberCode = (data, lang) => {
-  const value = data.value || '"42"'; // Default to string "42"
+  const value = data.value || '"42"';
   const result = data.result || 'numberValue';
 
   switch (lang) {
     case 'python':
-      return `${result} = float(${value})`; // Python: convert to float
+      return `${result} = float(${value})`;
     case 'java':
-      return `${result} = Integer.parseInt(${value});`; // Java: convert to integer using parseInt()
+      return `${result} = Integer.parseInt(${value});`;
     case 'cpp':
     case 'c':
-      return `int ${result} = std::stoi(${value});`; // C++: convert to integer using stoi()
+      return `int ${result} = std::stoi(${value});`;
     default:
-      return `let ${result} = Number(${value});`; // JavaScript: convert to number using Number()
+      return `let ${result} = Number(${value});`;
   }
 };
 const generateToBooleanCode = (data, lang) => {
-  const value = data.value || '1'; // Default to "1"
+  const value = data.value || '1';
   const result = data.result || 'boolValue';
-
   switch (lang) {
     case 'python':
-      return `${result} = bool(${value})`; // Python: convert to boolean using bool()
+      return `${result} = bool(${value})`;
     case 'java':
-      return `${result} = Boolean.parseBoolean(${value});`; // Java: convert to boolean using parseBoolean()
+      return `${result} = Boolean.parseBoolean(${value});`;
     case 'cpp':
     case 'c':
-      return `bool ${result} = (${value} != 0);`; // C++: convert to boolean using comparison
+      return `bool ${result} = (${value} != 0);`;
     default:
-      return `let ${result} = Boolean(${value});`; // JavaScript: convert to boolean using Boolean()
+      return `let ${result} = Boolean(${value});`;
   }
 };
 const generateRandomCode = (data, lang) => {
-  const min = data.min || 0; // Default minimum value is 0
-  const max = data.max || 100; // Default maximum value is 100
-  const result = data.result || 'randomValue'; // Default result variable name
+  const min = data.min || 0;
+  const max = data.max || 100;
+  const result = data.result || 'randomValue';
 
   switch (lang) {
     case 'python':
-      return `${result} = random.randint(${min}, ${max})`; // Python: random.randint for range
+      return `${result} = random.randint(${min}, ${max})`; 
     case 'java':
-      return `${result} = (int)(Math.random() * (${max} - ${min} + 1)) + ${min}`; // Java: generate random integer in range
+      return `${result} = (int)(Math.random() * (${max} - ${min} + 1)) + ${min}`;
     case 'cpp':
     case 'c':
-      return `#include <cstdlib>\n#include <ctime>\nstd::srand(std::time(0));\n${result} = std::rand() % (${max} - ${min} + 1) + ${min};`; // C++: use std::rand to generate random number
+      return `#include <cstdlib>\n#include <ctime>\nstd::srand(std::time(0));\n${result} = std::rand() % (${max} - ${min} + 1) + ${min};`; 
     default:
-      return `${result} = Math.floor(Math.random() * (${max} - ${min} + 1)) + ${min};`; // JavaScript: Math.random for random number
+      return `${result} = Math.floor(Math.random() * (${max} - ${min} + 1)) + ${min};`;
   }
 };
 
