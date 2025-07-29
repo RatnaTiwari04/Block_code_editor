@@ -109,14 +109,15 @@ const VisualBlockEditor = () => {
 
       <div className="main-content">
         <div className="header">
-          <h1>🧩 Block Code Editor</h1>
+          <h1></h1>
           <div className="header-buttons">
             <input
               type="text"
               placeholder="Project title"
               value={projectTitle}
               onChange={(e) => setProjectTitle(e.target.value)}
-              style={{ padding: '5px', fontSize: '14px' }}
+              style={{ padding: '5px', fontSize: '14px',border: '2px solid black',borderRadius: '4px'
+               }}
             />
             <select
               value={selectedLanguage}
