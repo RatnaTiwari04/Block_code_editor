@@ -13,13 +13,10 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-gray-900 text-white px-8 py-4 flex justify-between items-center shadow-md">
       {/* Left: Logo */}
-      <Link to="/" className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition">
-        CodeEditor
-      </Link>
 
       {/* Right: Navigation Links */}
       <div className="space-x-6 text-sm font-medium">
-        <Link to="/" className="hover:text-teal-400 transition">Editor</Link>
+        <Link to="/" className="hover:text-teal-400 transition">Code Editor</Link>
         {token ? (
           <>
             <Link to="/dashboard" className="hover:text-teal-400 transition">Dashboard</Link>
