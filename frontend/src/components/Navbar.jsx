@@ -28,15 +28,9 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {token ? (
             <>
-              <Link 
-                to="/dashboard" 
-                className="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-1 rounded-md hover:bg-gray-800"
-              >
-                Dashboard
-              </Link>
               <button
                 onClick={handleLogout}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors duration-200 font-medium text-white"
+                className="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-800"
               >
                 Logout
               </button>

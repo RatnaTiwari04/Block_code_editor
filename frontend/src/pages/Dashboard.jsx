@@ -56,10 +56,6 @@ const Dashboard = () => {
             <span className="title-icon">🚀</span>
             My Dashboard
           </h1>
-          <button onClick={handleLogout} className="logout-button">
-            <span className="logout-icon">👋</span>
-            Logout
-          </button>
         </div>
       </header>
 
