@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem('token');
 
   const handleLogout = () => {
@@ -28,6 +29,15 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {token ? (
             <>
+              {/* Only show Dashboard link if not on dashboard page */}
+              {location.pathname !== '/dashboard' && (
+                <Link 
+                  to="/dashboard" 
+                  className="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-800"
+                >
+                  Dashboard
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="text-gray-300 hover:text-white transition-colors duration-200 font-medium px-3 py-2 rounded-md hover:bg-gray-800"
