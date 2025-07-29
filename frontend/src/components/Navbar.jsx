@@ -1,26 +1,42 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
+
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
+    navigate('/');
   };
+
   return (
-    <nav style={{ padding: '10px', background: '#222', color: '#fff' }}>
-      <Link to="/" style={{ marginRight: '10px', color: '#fff' }}>Editor</Link>
-      {token ? (
-        <>
-          <Link to="/dashboard" style={{ marginRight: '10px', color: '#fff' }}>Dashboard</Link>
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" style={{ marginRight: '10px', color: '#fff' }}>Login</Link>
-          <Link to="/register" style={{ color: '#fff' }}>Register</Link>
-        </>
-      )}
+    <nav className="w-full bg-gray-900 text-white px-8 py-4 flex justify-between items-center shadow-md">
+      {/* Left: Logo */}
+      <Link to="/" className="text-2xl font-bold text-teal-400 hover:text-teal-300 transition">
+        CodeEditor
+      </Link>
+
+      {/* Right: Navigation Links */}
+      <div className="space-x-6 text-sm font-medium">
+        <Link to="/" className="hover:text-teal-400 transition">Editor</Link>
+        {token ? (
+          <>
+            <Link to="/dashboard" className="hover:text-teal-400 transition">Dashboard</Link>
+            <button
+              onClick={handleLogout}
+              className="bg-teal-600 hover:bg-teal-700 px-3 py-1 rounded transition"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="hover:text-teal-400 transition">Login</Link>
+            <Link to="/register" className="hover:text-teal-400 transition">Register</Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 };
