@@ -6,7 +6,7 @@ import Block from './Block';
 import { BLOCK_TYPES } from '../utils/blockTypes';
 import { generateCode } from '../utils/codeGenerator';
 import axios from 'axios';
-import Chatbot from './Chatbot'; // Import the Chatbot component
+import Chatbot from './Chatbot';
 
 const VisualBlockEditor = () => {
   const [blocks, setBlocks] = useState([]);
@@ -50,6 +50,8 @@ const VisualBlockEditor = () => {
   const clearCanvas = useCallback(() => {
     setBlocks([]);
     setSelectedBlock(null);
+    setGeneratedCode('// Drag blocks from the sidebar to start coding!');
+    setOutput('Click "Run Code" to see output...');
   }, []);
 
   const handleCanvasClick = useCallback((e) => {

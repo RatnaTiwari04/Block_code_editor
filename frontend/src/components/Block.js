@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { BLOCK_TYPES } from '../utils/blockTypes';
-import COLORS from '../styles/colors'; // color palette
+import COLORS from '../styles/colors';
 
 const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const [localData, setLocalData] = useState(block.data || {});
@@ -9,8 +9,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const blockRef = useRef(null);
 
   const blockType = BLOCK_TYPES[block.type];
-
-  // 🎨 Assign a random color once on mount
   const randomColor = useMemo(() => {
     return COLORS[Math.floor(Math.random() * COLORS.length)];
   }, []);
@@ -86,7 +84,7 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         left: block.position.x,
         top: block.position.y,
         zIndex: isDragging ? 1000 : isSelected ? 100 : 10,
-        backgroundColor: randomColor, // ✅ Random background color
+        backgroundColor: randomColor,
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={(e) => e.stopPropagation()}
@@ -106,12 +104,10 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         <button 
           className="block-close"
           onClick={handleDelete}
-          title="Delete block"
-        >
+          title="Delete block">
           ×
         </button>
       </div>
-
       {blockType.fields && blockType.fields.map((field) => (
         <div key={field.name} className="block-input">
           <label className="block-label">{field.label}:</label>
@@ -136,7 +132,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
           )}
         </div>
       ))}
-
       {(!blockType.fields || blockType.fields.length === 0) && (
         <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
           Double-click to configure
@@ -145,5 +140,4 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     </div>
   );
 };
-
 export default Block;

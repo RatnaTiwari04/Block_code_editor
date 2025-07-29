@@ -12,9 +12,6 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-gray-900 text-white px-8 py-4 flex justify-between items-center shadow-md">
-      {/* Left: Logo */}
-
-      {/* Right: Navigation Links */}
       <div className="space-x-6 text-sm font-medium">
         <Link to="/" className="hover:text-teal-400 transition">Code Editor</Link>
         {token ? (
