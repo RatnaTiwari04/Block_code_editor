@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Search } from 'lucide-react';
 import { BLOCK_TYPES } from '../utils/blockTypes';
 import './BlockPalette.css';
 
 const BlockPalette = ({ onAddBlock }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter blocks based on search term
+  const filteredBlocks = Object.entries(BLOCK_TYPES).filter(([key, blockType]) =>
+    blockType.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blockType.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="sidebar">
       <h3 className="sidebar-header">🔧 Blocks</h3>
+      
+      <div className="search-container">
+        <div className="search-input-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search blocks..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="block-search"
+          />
+        </div>
+      </div>
+
       <div className="blocks-list-container">
         <div className="blocks-list">
-          {Object.entries(BLOCK_TYPES).map(([key, blockType]) => (
+          {filteredBlocks.map(([key, blockType]) => (
             <button
               key={key}
               onClick={() => onAddBlock(key)}
@@ -20,6 +43,7 @@ const BlockPalette = ({ onAddBlock }) => {
           ))}
         </div>
       </div>
+      
       <div className="usage-instructions">
         <p><strong>How to use:</strong></p>
         <ul>

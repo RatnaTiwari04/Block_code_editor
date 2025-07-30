@@ -23,8 +23,8 @@ const VisualBlockEditor = () => {
       id: uuidv4(),
       type: blockType,
       position: {
-        x: 100 + (blocks.length * 150),
-        y: 100 + (blocks.length * 100)
+        x: 100 + (blocks.length * 100),
+        y: 100 + (blocks.length * 60)
       },
       data: {}
     };
@@ -156,23 +156,32 @@ const VisualBlockEditor = () => {
                   const to = blocks.find(b => b.id === conn.to);
                   if (!from || !to) return null;
                   return (
-                    <line
-                      key={idx}
-                      x1={from.position.x + 100} // adjust to center
-                      y1={from.position.y + 40}
-                      x2={to.position.x + 100}
-                      y2={to.position.y}
+                    <path
+                    key={idx}
+                    d={`
+                      M ${from.position.x + 100},${from.position.y + 80} 
+                      C ${from.position.x + 100},${from.position.y + 120}, 
+                      ${to.position.x + 100},${to.position.y - 40}, 
+                      ${to.position.x + 100},${to.position.y}
+                      `}
                       stroke="black"
                       strokeWidth="2"
+                      strokeDasharray="5,5"
+                      fill="none"
                       markerEnd="url(#arrowhead)"
-                    />
+                      />
                   );
                 })}
                 <defs>
-                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-                    <polygon points="0 0, 10 3.5, 0 7" fill="black" />
-                  </marker>
-                </defs>
+                  <marker
+                  id="arrowhead"
+                  viewBox="0 0 10 10"
+                  refX="5" refY="5"
+                  markerWidth="6" markerHeight="6"
+                  orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
+                    </marker>
+                    </defs>
               </svg>
               {blocks.map((block) => (
                 <Block
