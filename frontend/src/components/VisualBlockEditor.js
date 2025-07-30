@@ -3,13 +3,13 @@ import Editor from '@monaco-editor/react';
 import { v4 as uuidv4 } from 'uuid';
 import BlockPalette from './BlockPalette';
 import Block from './Block';
-import { BLOCK_TYPES } from '../utils/blockTypes';
 import { generateCode } from '../utils/codeGenerator';
 import axios from 'axios';
 import Chatbot from './Chatbot';
 
 const VisualBlockEditor = () => {
   const [blocks, setBlocks] = useState([]);
+  const [connections, setConnections] = useState([]);
   const [selectedBlock, setSelectedBlock] = useState(null);
   const [generatedCode, setGeneratedCode] = useState('// Drag blocks from the sidebar to start coding!');
   const [output, setOutput] = useState('Click "Run Code" to see output...');
@@ -19,45 +19,60 @@ const VisualBlockEditor = () => {
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
-  const newBlock = {
-    id: uuidv4(),
-    type: blockType,
-    position: {
-      x: 100 + (blocks.length * 30),
-      y: 100 + (blocks.length * 30)
-    },
-    data: {}
-  };
-  setBlocks(prevBlocks => [...prevBlocks, newBlock]);
-  setSelectedBlock(newBlock.id);
-}, [blocks.length]);
+    const newBlock = {
+      id: uuidv4(),
+      type: blockType,
+      position: {
+        x: 100 + (blocks.length * 150),
+        y: 100 + (blocks.length * 100)
+      },
+      data: {}
+    };
+    setBlocks(prev => [...prev, newBlock]);
+    setSelectedBlock(newBlock.id);
+
+    if (blocks.length > 0) {
+      const lastBlock = blocks[blocks.length - 1];
+      setConnections(prev => [...prev, { from: lastBlock.id, to: newBlock.id }]);
+    }
+  }, [blocks]);
 
   const updateBlock = useCallback((blockId, updates) => {
-    setBlocks(prevBlocks =>
-      prevBlocks.map(block =>
-        block.id === blockId ? { ...block, ...updates } : block
-      )
-    );
+    setBlocks(prev => prev.map(block =>
+      block.id === blockId ? { ...block, ...updates } : block
+    ));
   }, []);
 
   const deleteBlock = useCallback((blockId) => {
-    setBlocks(prevBlocks => prevBlocks.filter(block => block.id !== blockId));
-    if (selectedBlock === blockId) {
-      setSelectedBlock(null);
-    }
+    setBlocks(prev => prev.filter(b => b.id !== blockId));
+
+    setConnections(prev => {
+      const toRemove = prev.filter(conn => conn.from === blockId || conn.to === blockId);
+
+      let updated = prev.filter(conn => conn.from !== blockId && conn.to !== blockId);
+      const incoming = toRemove.find(conn => conn.to === blockId);
+      const outgoing = toRemove.find(conn => conn.from === blockId);
+
+      if (incoming && outgoing) {
+        updated.push({ from: incoming.from, to: outgoing.to });
+      }
+
+      return updated;
+    });
+
+    if (selectedBlock === blockId) setSelectedBlock(null);
   }, [selectedBlock]);
 
   const clearCanvas = useCallback(() => {
     setBlocks([]);
+    setConnections([]);
     setSelectedBlock(null);
     setGeneratedCode('// Drag blocks from the sidebar to start coding!');
     setOutput('Click "Run Code" to see output...');
   }, []);
 
   const handleCanvasClick = useCallback((e) => {
-    if (e.target === canvasRef.current) {
-      setSelectedBlock(null);
-    }
+    if (e.target === canvasRef.current) setSelectedBlock(null);
   }, []);
 
   useEffect(() => {
@@ -72,7 +87,7 @@ const VisualBlockEditor = () => {
       const response = await fetch('http://localhost:5000/api/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: generatedCode, language: selectedLanguage }),
+        body: JSON.stringify({ code: generatedCode, language: selectedLanguage })
       });
       const data = await response.json();
       setOutput(data.output);
@@ -83,10 +98,7 @@ const VisualBlockEditor = () => {
   };
 
   const saveProject = async () => {
-    if (!projectTitle) {
-      alert('Please enter a project title.');
-      return;
-    }
+    if (!projectTitle) return alert('Please enter a project title.');
     try {
       const token = localStorage.getItem('token');
       await axios.post('http://localhost:5000/api/projects', {
@@ -99,25 +111,22 @@ const VisualBlockEditor = () => {
       alert('Project saved successfully!');
     } catch (err) {
       console.error(err);
-      alert('Failed to save project.Please Login First');
+      alert('Failed to save project. Please Login First');
     }
   };
-
   return (
     <div className="block-editor">
       <BlockPalette onAddBlock={addBlock} />
-
       <div className="main-content">
         <div className="header">
-          <h1></h1>
+          <h1>🧩 Block Code Editor</h1>
           <div className="header-buttons">
             <input
               type="text"
               placeholder="Project title"
               value={projectTitle}
               onChange={(e) => setProjectTitle(e.target.value)}
-              style={{ padding: '5px', fontSize: '14px',border: '2px solid black',borderRadius: '4px'
-               }}
+              style={{ padding: '5px', fontSize: '14px', border: '2px solid black', borderRadius: '4px' }}
             />
             <select
               value={selectedLanguage}
@@ -130,26 +139,41 @@ const VisualBlockEditor = () => {
               <option value="cpp">C++</option>
               <option value="c">C</option>
             </select>
-
-            <button onClick={clearCanvas} className="btn btn-danger">
-              Clear All
-            </button>
+            <button onClick={clearCanvas} className="btn btn-danger">Clear All</button>
             <button onClick={runCode} disabled={isRunning} className="btn btn-success">
               {isRunning ? '⏳ Running...' : '▶️ Run Code'}
             </button>
-            <button onClick={saveProject} className="btn btn-primary">
-              💾 Save Project
-            </button>
+            <button onClick={saveProject} className="btn btn-primary">💾 Save Project</button>
           </div>
         </div>
-
         <div className="workspace">
           <div className="canvas-area">
-            <div
-              ref={canvasRef}
-              className="canvas"
-              onClick={handleCanvasClick}
-            >
+            <div ref={canvasRef} className="canvas" onClick={handleCanvasClick}>
+              {/* Draw arrows */}
+              <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
+                {connections.map((conn, idx) => {
+                  const from = blocks.find(b => b.id === conn.from);
+                  const to = blocks.find(b => b.id === conn.to);
+                  if (!from || !to) return null;
+                  return (
+                    <line
+                      key={idx}
+                      x1={from.position.x + 100} // adjust to center
+                      y1={from.position.y + 40}
+                      x2={to.position.x + 100}
+                      y2={to.position.y}
+                      stroke="black"
+                      strokeWidth="2"
+                      markerEnd="url(#arrowhead)"
+                    />
+                  );
+                })}
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+                  </marker>
+                </defs>
+              </svg>
               {blocks.map((block) => (
                 <Block
                   key={block.id}
@@ -162,47 +186,26 @@ const VisualBlockEditor = () => {
               ))}
             </div>
           </div>
-
           <div className="editor-panel">
-            <div className="editor-header">
-              📝 Generated Code ({selectedLanguage})
-            </div>
+            <div className="editor-header">📝 Generated Code ({selectedLanguage})</div>
             <div className="monaco-editor-container">
               <Editor
                 height="100%"
                 language={selectedLanguage}
                 value={generatedCode}
                 theme="vs-dark"
-                options={{
-                  readOnly: false,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  fontSize: 14,
-                  lineNumbers: 'on',
-                  automaticLayout: true,
-                  wordWrap: 'on',
-                  formatOnPaste: true,
-                  formatOnType: true
-                }}
+                options={{ readOnly: false, minimap: { enabled: false }, fontSize: 14 }}
               />
             </div>
-
             <div className="output-panel">
-              <div className="output-header">
-                💻 Console Output 
-              </div>
-              <div className="output-content">
-                {output}
-              </div>
+              <div className="output-header">💻 Console Output</div>
+              <div className="output-content">{output}</div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Add the Chatbot component */}
       <Chatbot />
     </div>
   );
 };
-
 export default VisualBlockEditor;

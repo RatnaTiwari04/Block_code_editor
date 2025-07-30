@@ -14,10 +14,8 @@ const Navbar = () => {
   return (
     <nav className="w-full bg-gray-900 text-white shadow-lg">
       <div className="container mx-auto px-4 h-11 flex justify-between items-center">
-        {/* Logo/Brand */}
         <div className="flex items-center">
-          <Link 
-            to="/" 
+          <Link to="/" 
             className="text-xl font-bold text-teal-400 hover:text-teal-300 transition-colors duration-200 flex items-center gap-2"
           >
             <span>🧩</span>
