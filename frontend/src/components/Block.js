@@ -4,13 +4,17 @@ import COLORS from '../styles/colors';
 
 const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const [localData, setLocalData] = useState(block.data || {});
+  const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const blockRef = useRef(null);
 
   const blockType = BLOCK_TYPES[block.type];
-  const randomColor = useMemo(() => {
-    return COLORS[Math.floor(Math.random() * COLORS.length)];
+  const randomColor = useMemo(() => COLORS[Math.floor(Math.random() * COLORS.length)], []);
+
+  const toggleMinimize = useCallback((e) => {
+    e.stopPropagation();
+    setIsMinimized(prev => !prev);
   }, []);
 
   const handleMouseDown = useCallback((e) => {
@@ -20,7 +24,7 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
 
     const rect = blockRef.current.getBoundingClientRect();
     const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
-    
+
     setIsDragging(true);
     setDragStart({
       x: e.clientX - (rect.left - parentRect.left),
@@ -44,8 +48,9 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   }, [isDragging, dragStart, block.id, onUpdate]);
 
   const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  setIsDragging(false);
+}, []);
+
 
   useEffect(() => {
     if (isDragging) {
@@ -85,15 +90,16 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         top: block.position.y,
         zIndex: isDragging ? 1000 : isSelected ? 100 : 10,
         backgroundColor: randomColor,
+        transition: 'height 0.2s ease'
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={(e) => e.stopPropagation()}
       onClick={handleBlockClick}
     >
-      {blockType.inputs && blockType.inputs.length > 0 && (
+      {blockType.inputs?.length > 0 && (
         <div className="connection-input" title="Input connection" />
       )}
-      {blockType.outputs && blockType.outputs.length > 0 && (
+      {blockType.outputs?.length > 0 && (
         <div className="connection-output" title="Output connection" />
       )}
 
@@ -101,41 +107,54 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
         <span className="block-title">
           {blockType.icon} {blockType.label}
         </span>
-        <button 
-          className="block-close"
-          onClick={handleDelete}
-          title="Delete block">
-          ×
-        </button>
+        <div style={{ display: 'flex', gap: '4px' }}>
+          <button
+            className="block-minimize"
+            onClick={toggleMinimize}
+            title={isMinimized ? "Expand block" : "Minimize block"}>
+            {isMinimized ? '🔽' : '🔼'}
+          </button>
+          <button 
+            className="block-close"
+            onClick={handleDelete}
+            title="Delete block">
+            ×
+          </button>
+        </div>
       </div>
-      {blockType.fields && blockType.fields.map((field) => (
-        <div key={field.name} className="block-input">
-          <label className="block-label">{field.label}:</label>
-          {field.type === 'textarea' ? (
-            <textarea
-              className="block-field"
-              placeholder={field.placeholder}
-              value={localData[field.name] || ''}
-              onChange={(e) => handleDataChange(field.name, e.target.value)}
-              rows={3}
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <input
-              type={field.type || 'text'}
-              className="block-field"
-              placeholder={field.placeholder}
-              value={localData[field.name] || ''}
-              onChange={(e) => handleDataChange(field.name, e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-            />
+
+      {!isMinimized && (
+        <>
+          {blockType.fields?.map((field) => (
+            <div key={field.name} className="block-input">
+              <label className="block-label">{field.label}:</label>
+              {field.type === 'textarea' ? (
+                <textarea
+                  className="block-field"
+                  placeholder={field.placeholder}
+                  value={localData[field.name] || ''}
+                  onChange={(e) => handleDataChange(field.name, e.target.value)}
+                  rows={3}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <input
+                  type={field.type || 'text'}
+                  className="block-field"
+                  placeholder={field.placeholder}
+                  value={localData[field.name] || ''}
+                  onChange={(e) => handleDataChange(field.name, e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              )}
+            </div>
+          ))}
+          {(!blockType.fields || blockType.fields.length === 0) && (
+            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
+              Double-click to configure
+            </div>
           )}
-        </div>
-      ))}
-      {(!blockType.fields || blockType.fields.length === 0) && (
-        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)', fontStyle: 'italic' }}>
-          Double-click to configure
-        </div>
+        </>
       )}
     </div>
   );

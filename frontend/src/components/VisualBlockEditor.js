@@ -19,18 +19,18 @@ const VisualBlockEditor = () => {
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
-    const newBlock = {
-      id: uuidv4(),
-      type: blockType,
-      position: {
-        x: 100 + (blocks.length * 30),
-        y: 100 + (blocks.length * 30)
-      },
-      data: {}
-    };
-    setBlocks(prevBlocks => [...prevBlocks, newBlock]);
-    setSelectedBlock(newBlock.id);
-  }, [blocks.length]);
+  const newBlock = {
+    id: uuidv4(),
+    type: blockType,
+    position: {
+      x: 100 + (blocks.length * 30),
+      y: 100 + (blocks.length * 30)
+    },
+    data: {}
+  };
+  setBlocks(prevBlocks => [...prevBlocks, newBlock]);
+  setSelectedBlock(newBlock.id);
+}, [blocks.length]);
 
   const updateBlock = useCallback((blockId, updates) => {
     setBlocks(prevBlocks =>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './Dashboard.css'; // Import the CSS file
+import './Dashboard.css';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -53,7 +53,6 @@ const Dashboard = () => {
       <header className="dashboard-header">
         <div className="header-content">
           <h1 className="dashboard-title">
-            <span className="title-icon">🚀</span>
             My Dashboard
           </h1>
         </div>
