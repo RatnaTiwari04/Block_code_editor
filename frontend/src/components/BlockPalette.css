@@ -16,7 +16,7 @@
 
 /* Header styling */
 .sidebar-header {
-  padding: 15px 20px;
+  padding: 8px 20px;
   margin: 0;
   background-color: #34495e;
   border-bottom: 1px solid #4a5f7a;
@@ -51,6 +51,38 @@
 
 .blocks-list-container::-webkit-scrollbar-thumb:hover {
   background: #6c7b8a;
+}
+
+.search-container {
+  padding: 8px 0;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 8px;
+  color: #666;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.block-search {
+  width: 100%;
+  padding: 8px 12px 8px 32px; /* Extra left padding for the icon */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+.block-search:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* Firefox scrollbar styling */
