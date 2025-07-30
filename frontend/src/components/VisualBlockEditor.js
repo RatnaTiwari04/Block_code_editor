@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Editor from '@monaco-editor/react';
 import { v4 as uuidv4 } from 'uuid';
 import BlockPalette from './BlockPalette';
@@ -16,6 +17,7 @@ const VisualBlockEditor = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('javascript');
   const [projectTitle, setProjectTitle] = useState('');
+  const [isEditorPanelOpen, setIsEditorPanelOpen] = useState(true);
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
@@ -114,6 +116,9 @@ const VisualBlockEditor = () => {
       alert('Failed to save project. Please Login First');
     }
   };
+  const toggleEditorPanel = () => {
+    setIsEditorPanelOpen(!isEditorPanelOpen);
+  };
   return (
     <div className="block-editor">
       <BlockPalette onAddBlock={addBlock} />
@@ -147,7 +152,13 @@ const VisualBlockEditor = () => {
           </div>
         </div>
         <div className="workspace">
-          <div className="canvas-area">
+          <div 
+            className="canvas-area" 
+            style={{ 
+              flex: isEditorPanelOpen ? '1' : '1 1 100%',
+              transition: 'all 0.3s ease'
+            }}
+          >
             <div ref={canvasRef} className="canvas" onClick={handleCanvasClick}>
               {/* Draw arrows */}
               <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
@@ -195,9 +206,52 @@ const VisualBlockEditor = () => {
               ))}
             </div>
           </div>
-          <div className="editor-panel">
-            <div className="editor-header">📝 Generated Code ({selectedLanguage})</div>
-            <div className="monaco-editor-container">
+          <button 
+            onClick={toggleEditorPanel}
+            style={{
+              position: 'absolute',
+              right: isEditorPanelOpen ? '400px' : '0px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: '#2c3e50',
+              color: 'white',
+              border: 'none',
+              padding: '12px 6px',
+              borderRadius: '6px 0 0 6px',
+              cursor: 'pointer',
+              zIndex: 1000,
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '-2px 0 8px rgba(0,0,0,0.2)'
+            }}
+            title={isEditorPanelOpen ? "Hide Code Panel" : "Show Code Panel"}
+          >
+            {isEditorPanelOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </button>
+          <div 
+            style={{
+              width: isEditorPanelOpen ? '400px' : '0px',
+              opacity: isEditorPanelOpen ? 1 : 0,
+              overflow: 'hidden',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              background: 'white',
+              borderLeft: isEditorPanelOpen ? '1px solid #ddd' : 'none'
+            }}
+          >
+            <div style={{
+              background: '#2c3e50',
+              color: 'white',
+              padding: '10px',
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap'
+            }}>
+              📝 Generated Code ({selectedLanguage})
+            </div>
+            <div style={{ flex: 1, minHeight: '300px' }}>
               <Editor
                 height="100%"
                 language={selectedLanguage}
@@ -206,9 +260,29 @@ const VisualBlockEditor = () => {
                 options={{ readOnly: false, minimap: { enabled: false }, fontSize: 14 }}
               />
             </div>
-            <div className="output-panel">
-              <div className="output-header">💻 Console Output</div>
-              <div className="output-content">{output}</div>
+            <div style={{ borderTop: '1px solid #ddd' }}>
+              <div style={{
+                background: '#34495e',
+                color: 'white',
+                padding: '8px 10px',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                whiteSpace: 'nowrap'
+              }}>
+                💻 Console Output
+              </div>
+              <div style={{
+                padding: '10px',
+                background: '#0c0c0c',
+                fontFamily: 'Courier New, monospace',
+                fontSize: '12px',
+                whiteSpace: 'pre-wrap',
+                height: '150px',
+                overflowY: 'auto',
+                color: '#608b4e'
+              }}>
+                {output}
+              </div>
             </div>
           </div>
         </div>
