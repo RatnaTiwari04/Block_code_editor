@@ -19,25 +19,23 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = blockRef.current.getBoundingClientRect();
-    const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
-
     setIsDragging(true);
     setDragStart({
-      x: e.clientX - (rect.left - parentRect.left),
-      y: e.clientY - (rect.top - parentRect.top)
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      blockX: block.position.x,
+      blockY: block.position.y,
     });
-
     onSelect(block.id);
   }, [block.id, onSelect]);
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
     e.preventDefault();
-
-    const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
+    const deltaX = e.clientX - dragStart.mouseX;
+    const deltaY = e.clientY - dragStart.mouseY;
     const newPosition = {
-      x: Math.max(0, e.clientX - parentRect.left - dragStart.x),
-      y: Math.max(0, e.clientY - parentRect.top - dragStart.y)
+      x: Math.max(0, dragStart.blockX + deltaX),
+      y: Math.max(0, dragStart.blockY + deltaY),
     };
     onUpdate(block.id, { position: newPosition });
   }, [isDragging, dragStart, block.id, onUpdate]);

@@ -389,7 +389,6 @@ const generateSwitchCode = (data, lang) => {
       const casesPython = Object.entries(casesJson).map(([caseKey, code]) =>
         `elif ${value} == ${caseKey}:\n${indentLines(code || 'pass', '  ')}`
       ).join('\n');
-      const defaultPython = defaultCase ? `else:\n${indentLines(defaultCase, '  ')}` : '';
       const pythonSwitch = casesPython.length > 0
         ? `if ${value} == ${Object.entries(casesJson)[0][0]}:\n${indentLines(Object.entries(casesJson)[0][1] || 'pass', '  ')}\n` +
           Object.entries(casesJson).slice(1).map(([caseKey, code]) =>
