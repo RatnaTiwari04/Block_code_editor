@@ -8,19 +8,12 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const blockRef = useRef(null);
-
   const blockType = BLOCK_TYPES[block.type];
-
-  // Assign a consistent random color on mount
   const randomColor = useMemo(() => COLORS[Math.floor(Math.random() * COLORS.length)], []);
-
-  /** Toggle minimize/expand */
   const toggleMinimize = useCallback((e) => {
     e.stopPropagation();
     setIsMinimized(prev => !prev);
   }, []);
-
-  /** Start dragging */
   const handleMouseDown = useCallback((e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault();
@@ -37,8 +30,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
 
     onSelect(block.id);
   }, [block.id, onSelect]);
-
-  /** Update position during dragging */
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
     e.preventDefault();
@@ -48,17 +39,11 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       x: Math.max(0, e.clientX - parentRect.left - dragStart.x),
       y: Math.max(0, e.clientY - parentRect.top - dragStart.y)
     };
-
     onUpdate(block.id, { position: newPosition });
   }, [isDragging, dragStart, block.id, onUpdate]);
-
-  /** Stop dragging */
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-    // Later: add snap or connector update logic
   }, []);
-
-  /** Add/remove global listeners on drag */
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
@@ -70,20 +55,20 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  /** Change block field data */
+  /** Change block field data **/
   const handleDataChange = useCallback((key, value) => {
     const newData = { ...localData, [key]: value };
     setLocalData(newData);
     onUpdate(block.id, { data: newData });
   }, [localData, block.id, onUpdate]);
 
-  /** Delete block */
+  /** Delete block **/
   const handleDelete = useCallback((e) => {
     e.stopPropagation();
     onDelete(block.id);
   }, [block.id, onDelete]);
 
-  /** Select block */
+  /** Select block **/
   const handleBlockClick = useCallback((e) => {
     e.stopPropagation();
     onSelect(block.id);
@@ -105,8 +90,7 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={(e) => e.stopPropagation()}
-      onClick={handleBlockClick}
-    >
+      onClick={handleBlockClick}>
       {/* Visual connection dots */}
       {blockType.inputs?.length > 0 && (
         <div className="connection-input" title="Input connection" />
@@ -114,7 +98,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       {blockType.outputs?.length > 0 && (
         <div className="connection-output" title="Output connection" />
       )}
-
       {/* Header with title & buttons */}
       <div className="block-header">
         <span className="block-title">

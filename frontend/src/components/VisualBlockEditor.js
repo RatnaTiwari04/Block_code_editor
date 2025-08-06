@@ -7,7 +7,6 @@ import Block from './Block';
 import { generateCode } from '../utils/codeGenerator';
 import axios from 'axios';
 import Chatbot from './Chatbot';
-
 const VisualBlockEditor = () => {
   const [blocks, setBlocks] = useState([]);
   const [connections, setConnections] = useState([]);
@@ -21,23 +20,44 @@ const VisualBlockEditor = () => {
   const canvasRef = useRef(null);
 
   const addBlock = useCallback((blockType) => {
-    const newBlock = {
-      id: uuidv4(),
-      type: blockType,
-      position: {
-        x: 100 + (blocks.length * 100),
-        y: 100 + (blocks.length * 60)
-      },
-      data: {}
-    };
-    setBlocks(prev => [...prev, newBlock]);
-    setSelectedBlock(newBlock.id);
+  const canvas = canvasRef.current;
+  const blockWidth = 180;  // adjust to your actual block + margin
+  const blockHeight = 140; // adjust to actual height + margin
+  const startX = 50;       // starting margin left
+  const startY = 50;       // starting margin top
+  const gapX = 20;         // horizontal gap between blocks
+  const gapY = 20;         // vertical gap between rows
 
-    if (blocks.length > 0) {
-      const lastBlock = blocks[blocks.length - 1];
-      setConnections(prev => [...prev, { from: lastBlock.id, to: newBlock.id }]);
-    }
-  }, [blocks]);
+  let blocksPerRow =1; // fallback
+
+  if (canvas) {
+    const canvasWidth = canvas.offsetWidth - startX; // account for left margin
+    blocksPerRow = Math.max(1, Math.floor((canvasWidth) / (blockWidth + gapX)));
+  }
+
+  const index = blocks.length;
+  const col = index % blocksPerRow;
+  const row = Math.floor(index / blocksPerRow);
+
+  const newX = startX + col * (blockWidth + gapX);
+  const newY = startY + row * (blockHeight + gapY);
+
+  const newBlock = {
+    id: uuidv4(),
+    type: blockType,
+    position: { x: newX, y: newY },
+    data: {}
+  };
+
+  setBlocks(prev => [...prev, newBlock]);
+  setSelectedBlock(newBlock.id);
+
+  if (blocks.length > 0) {
+    const lastBlock = blocks[blocks.length - 1];
+    setConnections(prev => [...prev, { from: lastBlock.id, to: newBlock.id }]);
+  }
+}, [blocks]);
+
 
   const updateBlock = useCallback((blockId, updates) => {
     setBlocks(prev => prev.map(block =>
@@ -81,6 +101,7 @@ const VisualBlockEditor = () => {
     const code = generateCode(blocks, selectedLanguage);
     setGeneratedCode(code);
   }, [blocks, selectedLanguage]);
+
 
   const runCode = async () => {
     setIsRunning(true);
@@ -160,7 +181,6 @@ const VisualBlockEditor = () => {
             }}
           >
             <div ref={canvasRef} className="canvas" onClick={handleCanvasClick}>
-              {/* Draw arrows */}
               <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
                 {connections.map((conn, idx) => {
                   const from = blocks.find(b => b.id === conn.from);
@@ -170,7 +190,7 @@ const VisualBlockEditor = () => {
                     <path
                     key={idx}
                     d={`
-                      M ${from.position.x + 100},${from.position.y + 80} 
+                      M ${from.position.x + 100},${from.position.y + 65} 
                       C ${from.position.x + 100},${from.position.y + 120}, 
                       ${to.position.x + 100},${to.position.y - 40}, 
                       ${to.position.x + 100},${to.position.y}
@@ -279,7 +299,7 @@ const VisualBlockEditor = () => {
                 whiteSpace: 'pre-wrap',
                 height: '150px',
                 overflowY: 'auto',
-                color: '#608b4e'
+                color: '#56E01C'
               }}>
                 {output}
               </div>
