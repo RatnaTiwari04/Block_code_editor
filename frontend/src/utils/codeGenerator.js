@@ -8,6 +8,7 @@ export const generateCode = (blocks, selectedLanguage = 'javascript') => {
   let code = '';
   let mainBody = '';
   let otherMethods = '';
+
   const codeHeader = {
     javascript: '// Generated JavaScript code from visual blocks\n\n',
     python: '# Generated Python code from visual blocks\n\n',
@@ -17,9 +18,14 @@ export const generateCode = (blocks, selectedLanguage = 'javascript') => {
   }[selectedLanguage] || '';
 
   code += codeHeader;
-  const sortedBlocks = [...blocks].sort((a, b) => a.position.y - b.position.y);
+  const sortedBlocks = [...blocks].sort((a, b) => {
+    if (a.createdAt && b.createdAt) {
+      return a.createdAt - b.createdAt;
+    }
+    return 0; 
+  });
 
-  sortedBlocks.forEach((block, index) => {
+  sortedBlocks.forEach((block) => {
     const blockCode = generateBlockCode(block, selectedLanguage);
     if (!blockCode.trim()) return;
 
@@ -34,6 +40,7 @@ export const generateCode = (blocks, selectedLanguage = 'javascript') => {
       code += blockCode + '\n\n';
     }
   });
+
   if (selectedLanguage === 'java') {
     code += 'public class Main {\n\n';
     code += '  public static void main(String[] args) {\n';
@@ -382,7 +389,6 @@ const generateSwitchCode = (data, lang) => {
       const casesPython = Object.entries(casesJson).map(([caseKey, code]) =>
         `elif ${value} == ${caseKey}:\n${indentLines(code || 'pass', '  ')}`
       ).join('\n');
-      const defaultPython = defaultCase ? `else:\n${indentLines(defaultCase, '  ')}` : '';
       const pythonSwitch = casesPython.length > 0
         ? `if ${value} == ${Object.entries(casesJson)[0][0]}:\n${indentLines(Object.entries(casesJson)[0][1] || 'pass', '  ')}\n` +
           Object.entries(casesJson).slice(1).map(([caseKey, code]) =>

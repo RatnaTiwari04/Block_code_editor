@@ -2,6 +2,7 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { BLOCK_TYPES } from '../utils/blockTypes';
 import COLORS from '../styles/colors';
 
+
 const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const [localData, setLocalData] = useState(block.data || {});
   const [isMinimized, setIsMinimized] = useState(false);
