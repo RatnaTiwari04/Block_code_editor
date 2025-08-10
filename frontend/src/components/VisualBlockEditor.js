@@ -140,6 +140,7 @@ const VisualBlockEditor = () => {
   const toggleEditorPanel = () => {
     setIsEditorPanelOpen(!isEditorPanelOpen);
   };
+  
   return (
     <div className="block-editor">
       <BlockPalette onAddBlock={addBlock} />
@@ -181,7 +182,7 @@ const VisualBlockEditor = () => {
             }}
           >
             <div ref={canvasRef} className="canvas" onClick={handleCanvasClick}>
-              <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
+              <svg style={{ position: 'absolute', width: '100%', minHeight: '2000px', pointerEvents: 'none' }}>
                 {connections.map((conn, idx) => {
                   const from = blocks.find(b => b.id === conn.from);
                   const to = blocks.find(b => b.id === conn.to);
