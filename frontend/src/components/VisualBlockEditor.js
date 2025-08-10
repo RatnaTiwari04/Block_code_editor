@@ -20,31 +20,69 @@ const VisualBlockEditor = () => {
   const [isEditorPanelOpen, setIsEditorPanelOpen] = useState(true);
   const canvasRef = useRef(null);
 
+  // Positioning constants
+  const blockWidth = 180;
+  const blockHeight = 140;
+  const startX = 50;
+  const startY = 50;
+  const gapX = 20;
+  const gapY = 60;
+
+  // Reposition all blocks based on current canvas width
+  const repositionBlocks = useCallback((blocksToPosition) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return blocksToPosition;
+
+    const canvasWidth = canvas.offsetWidth - startX;
+    const blocksPerRow = Math.max(1, Math.floor(canvasWidth / (blockWidth + gapX)));
+
+    return blocksToPosition.map((block, index) => {
+      const col = index % blocksPerRow;
+      const row = Math.floor(index / blocksPerRow);
+
+      return {
+        ...block,
+        position: {
+          x: startX + col * (blockWidth + gapX),
+          y: startY + row * (blockHeight + gapY),
+        }
+      };
+    });
+  }, [blockWidth, blockHeight, startX, startY, gapX, gapY]);
+
+  // Add a new block and reposition all blocks
   const addBlock = useCallback((blockType) => {
     const newBlock = {
       id: uuidv4(),
       type: blockType,
-      position: {
-        x: 100 + (blocks.length * 150),
-        y: 100 + (blocks.length * 100)
-      },
-      data: {}
+      position: { x: 0, y: 0 }, // temporary, will reposition below
+      data: {},
     };
-    setBlocks(prev => [...prev, newBlock]);
+
+    setBlocks(prevBlocks => {
+      const newBlocks = [...prevBlocks, newBlock];
+      const repositioned = repositionBlocks(newBlocks);
+      return repositioned;
+    });
+
     setSelectedBlock(newBlock.id);
 
-    if (blocks.length > 0) {
+    setConnections(prev => {
+      if (blocks.length === 0) return prev;
       const lastBlock = blocks[blocks.length - 1];
-      setConnections(prev => [...prev, { from: lastBlock.id, to: newBlock.id }]);
-    }
-  }, [blocks]);
+      return [...prev, { from: lastBlock.id, to: newBlock.id }];
+    });
 
+  }, [blocks.length, repositionBlocks, blocks]);
+
+  // Update a block
   const updateBlock = useCallback((blockId, updates) => {
     setBlocks(prev => prev.map(block =>
       block.id === blockId ? { ...block, ...updates } : block
     ));
   }, []);
 
+  // Delete a block and update connections
   const deleteBlock = useCallback((blockId) => {
     setBlocks(prev => prev.filter(b => b.id !== blockId));
 
@@ -82,6 +120,20 @@ const VisualBlockEditor = () => {
     setGeneratedCode(code);
   }, [blocks, selectedLanguage]);
 
+  // Reposition blocks on editor panel toggle
+  useEffect(() => {
+    setBlocks(prev => repositionBlocks(prev));
+  }, [isEditorPanelOpen, repositionBlocks]);
+
+  // Optional: reposition on window resize for responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      setBlocks(prev => repositionBlocks(prev));
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [repositionBlocks]);
+
   const runCode = async () => {
     setIsRunning(true);
     setOutput('Running...');
@@ -118,7 +170,7 @@ const VisualBlockEditor = () => {
   };
 
   const toggleEditorPanel = () => {
-    setIsEditorPanelOpen(!isEditorPanelOpen);
+    setIsEditorPanelOpen(prev => !prev);
   };
 
   return (
@@ -154,36 +206,44 @@ const VisualBlockEditor = () => {
           </div>
         </div>
         <div className="workspace">
-          <div 
-            className="canvas-area" 
-            style={{ 
+          <div
+            className="canvas-area"
+            style={{
               flex: isEditorPanelOpen ? '1' : '1 1 100%',
               transition: 'all 0.3s ease'
             }}
           >
             <div ref={canvasRef} className="canvas" onClick={handleCanvasClick}>
-              {/* Draw arrows */}
-              <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }}>
+              <svg style={{ position: 'absolute', width: '100%', minHeight: '2000px', pointerEvents: 'none' }}>
                 {connections.map((conn, idx) => {
                   const from = blocks.find(b => b.id === conn.from);
                   const to = blocks.find(b => b.id === conn.to);
                   if (!from || !to) return null;
                   return (
-                    <line
+                    <path
                       key={idx}
-                      x1={from.position.x + 100} // adjust to center
-                      y1={from.position.y + 40}
-                      x2={to.position.x + 100}
-                      y2={to.position.y}
+                      d={`
+                        M ${from.position.x + 100},${from.position.y + 65} 
+                        C ${from.position.x + 100},${from.position.y + 120}, 
+                        ${to.position.x + 100},${to.position.y - 40}, 
+                        ${to.position.x + 100},${to.position.y}
+                        `}
                       stroke="black"
                       strokeWidth="2"
+                      strokeDasharray="5,5"
+                      fill="none"
                       markerEnd="url(#arrowhead)"
                     />
                   );
                 })}
                 <defs>
-                  <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-                    <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+                  <marker
+                    id="arrowhead"
+                    viewBox="0 0 10 10"
+                    refX="5" refY="5"
+                    markerWidth="6" markerHeight="6"
+                    orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
                   </marker>
                 </defs>
               </svg>
@@ -199,9 +259,7 @@ const VisualBlockEditor = () => {
               ))}
             </div>
           </div>
-          
-          {/* Toggle Button */}
-          <button 
+          <button
             onClick={toggleEditorPanel}
             style={{
               position: 'absolute',
@@ -225,9 +283,7 @@ const VisualBlockEditor = () => {
           >
             {isEditorPanelOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
-
-          {/* Editor Panel */}
-          <div 
+          <div
             style={{
               width: isEditorPanelOpen ? '400px' : '0px',
               opacity: isEditorPanelOpen ? 1 : 0,
@@ -276,7 +332,7 @@ const VisualBlockEditor = () => {
                 whiteSpace: 'pre-wrap',
                 height: '150px',
                 overflowY: 'auto',
-                color: '#608b4e'
+                color: '#56E01C'
               }}>
                 {output}
               </div>

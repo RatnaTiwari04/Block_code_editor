@@ -2,64 +2,46 @@ import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { BLOCK_TYPES } from '../utils/blockTypes';
 import COLORS from '../styles/colors';
 
-
 const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
   const [localData, setLocalData] = useState(block.data || {});
   const [isMinimized, setIsMinimized] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const blockRef = useRef(null);
-
   const blockType = BLOCK_TYPES[block.type];
-
-  // Assign a consistent random color on mount
   const randomColor = useMemo(() => COLORS[Math.floor(Math.random() * COLORS.length)], []);
-
-  /** Toggle minimize/expand */
   const toggleMinimize = useCallback((e) => {
     e.stopPropagation();
     setIsMinimized(prev => !prev);
   }, []);
-
-  /** Start dragging */
   const handleMouseDown = useCallback((e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
     e.preventDefault();
     e.stopPropagation();
 
-    const rect = blockRef.current.getBoundingClientRect();
-    const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
-
     setIsDragging(true);
     setDragStart({
-      x: e.clientX - (rect.left - parentRect.left),
-      y: e.clientY - (rect.top - parentRect.top)
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      blockX: block.position.x,
+      blockY: block.position.y,
     });
-
     onSelect(block.id);
   }, [block.id, onSelect]);
-
-  /** Update position during dragging */
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
     e.preventDefault();
-
-    const parentRect = blockRef.current.offsetParent.getBoundingClientRect();
+    const deltaX = e.clientX - dragStart.mouseX;
+    const deltaY = e.clientY - dragStart.mouseY;
     const newPosition = {
-      x: Math.max(0, e.clientX - parentRect.left - dragStart.x),
-      y: Math.max(0, e.clientY - parentRect.top - dragStart.y)
+      x: Math.max(0, dragStart.blockX + deltaX),
+      y: Math.max(0, dragStart.blockY + deltaY),
     };
-
     onUpdate(block.id, { position: newPosition });
   }, [isDragging, dragStart, block.id, onUpdate]);
-
-  /** Stop dragging */
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
-    // Later: add snap or connector update logic
   }, []);
-
-  /** Add/remove global listeners on drag */
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
@@ -71,20 +53,20 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  /** Change block field data */
+  /** Change block field data **/
   const handleDataChange = useCallback((key, value) => {
     const newData = { ...localData, [key]: value };
     setLocalData(newData);
     onUpdate(block.id, { data: newData });
   }, [localData, block.id, onUpdate]);
 
-  /** Delete block */
+  /** Delete block **/
   const handleDelete = useCallback((e) => {
     e.stopPropagation();
     onDelete(block.id);
   }, [block.id, onDelete]);
 
-  /** Select block */
+  /** Select block **/
   const handleBlockClick = useCallback((e) => {
     e.stopPropagation();
     onSelect(block.id);
@@ -106,8 +88,7 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       }}
       onMouseDown={handleMouseDown}
       onDoubleClick={(e) => e.stopPropagation()}
-      onClick={handleBlockClick}
-    >
+      onClick={handleBlockClick}>
       {/* Visual connection dots */}
       {blockType.inputs?.length > 0 && (
         <div className="connection-input" title="Input connection" />
@@ -115,7 +96,6 @@ const Block = ({ block, onUpdate, onDelete, isSelected, onSelect }) => {
       {blockType.outputs?.length > 0 && (
         <div className="connection-output" title="Output connection" />
       )}
-
       {/* Header with title & buttons */}
       <div className="block-header">
         <span className="block-title">
