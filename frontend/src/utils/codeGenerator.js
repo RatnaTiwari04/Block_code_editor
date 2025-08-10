@@ -432,10 +432,17 @@ const generatePrintCode = (data, lang) => {
   const value = data.value || '"Hello World!"';
   const isVariable = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(value.trim());
   const isAlreadyQuoted = value.includes('"') || value.includes("'");
+  
   let formattedValue = value;
   if (!isVariable && !isAlreadyQuoted && isNaN(value)) {
     formattedValue = `"${value}"`;
   }
+
+  // Enhanced C language support with automatic format specifier selection
+  if (lang === 'c') {
+    return generateCPrintCode(data, formattedValue, isVariable, isAlreadyQuoted);
+  }
+
   switch (lang) {
     case 'python':
       return `print(${formattedValue})`;
@@ -443,12 +450,242 @@ const generatePrintCode = (data, lang) => {
       return `System.out.println(${formattedValue});`;
     case 'cpp':
       return `cout << ${formattedValue} << endl;`;
-    case 'c':
-      return `printf("%s\\n", ${formattedValue});`;
     default:
       return `console.log(${formattedValue});`;
   }
 };
+
+const generateCPrintCode = (data, formattedValue, isVariable, isAlreadyQuoted) => {
+  const value = data.value || '"Hello World!"';
+  const trimmedValue = value.trim();
+  
+  // Check if explicit type is provided in data
+  if (data.type) {
+    return generateCWithExplicitType(data.type, formattedValue, trimmedValue);
+  }
+  
+  // Auto-detect type and generate appropriate printf
+  return generateCWithAutoDetection(trimmedValue, formattedValue, isVariable, isAlreadyQuoted);
+};
+
+const generateCWithExplicitType = (type, formattedValue, trimmedValue) => {
+  switch (type.toLowerCase()) {
+    case 'int':
+    case 'integer':
+      return `printf("%d\\n", ${formattedValue});`;
+    
+    case 'long':
+      return `printf("%ld\\n", ${formattedValue});`;
+    
+    case 'float':
+      return `printf("%.2f\\n", ${formattedValue});`;
+    
+    case 'double':
+      return `printf("%.2lf\\n", ${formattedValue});`;
+    
+    case 'char':
+      return `printf("%c\\n", ${formattedValue});`;
+    
+    case 'string':
+    case 'str':
+      if (formattedValue.startsWith('"') && formattedValue.endsWith('"')) {
+        // String literal - print directly
+        return `printf("${formattedValue.slice(1, -1)}\\n");`;
+      } else {
+        // String variable
+        return `printf("%s\\n", ${formattedValue});`;
+      }
+    
+    case 'unsigned':
+    case 'uint':
+      return `printf("%u\\n", ${formattedValue});`;
+    
+    case 'hex':
+    case 'hexadecimal':
+      return `printf("0x%x\\n", ${formattedValue});`;
+    
+    case 'octal':
+      return `printf("%o\\n", ${formattedValue});`;
+    
+    case 'pointer':
+    case 'ptr':
+      return `printf("%p\\n", ${formattedValue});`;
+    
+    case 'scientific':
+      return `printf("%e\\n", ${formattedValue});`;
+    
+    default:
+      return `printf("%s\\n", ${formattedValue});`;
+  }
+};
+
+const generateCWithAutoDetection = (trimmedValue, formattedValue, isVariable, isAlreadyQuoted) => {
+  // If it's a variable, we need to make educated guesses based on naming
+  if (isVariable) {
+    return generateCForVariable(trimmedValue, formattedValue);
+  }
+  
+  // If it's already quoted or formatted as string, it's a string literal
+  if (isAlreadyQuoted || formattedValue.startsWith('"')) {
+    // Remove quotes for direct printf output
+    const cleanValue = formattedValue.replace(/^"|"$/g, '');
+    return `printf("${cleanValue}\\n");`;
+  }
+  
+  // Check if it's a number
+  if (!isNaN(trimmedValue) && trimmedValue !== '') {
+    if (trimmedValue.includes('.')) {
+      // Float/double
+      return `printf("%.2f\\n", ${formattedValue});`;
+    } else {
+      // Integer - check range for int vs long
+      const num = parseInt(trimmedValue);
+      if (num >= -2147483648 && num <= 2147483647) {
+        return `printf("%d\\n", ${formattedValue});`;
+      } else {
+        return `printf("%ld\\n", ${formattedValue});`;
+      }
+    }
+  }
+  
+  // Check if it's a single character (not quoted)
+  if (trimmedValue.length === 1 && /[a-zA-Z0-9]/.test(trimmedValue)) {
+    return `printf("%c\\n", '${trimmedValue}');`;
+  }
+  
+  // Check for boolean-like values
+  if (trimmedValue.toLowerCase() === 'true' || trimmedValue.toLowerCase() === 'false') {
+    return `printf("%s\\n", ${trimmedValue.toLowerCase() === 'true' ? '"true"' : '"false"'});`;
+  }
+  
+  // Default to string for unknown values
+  return `printf("${trimmedValue}\\n");`;
+};
+
+const generateCForVariable = (trimmedValue, formattedValue) => {
+  // Make educated guesses based on variable naming conventions
+  const varName = trimmedValue.toLowerCase();
+  
+  // Common integer variable patterns
+  if (varName.includes('count') || varName.includes('size') || varName.includes('length') || 
+      varName.includes('index') || varName.includes('num') || varName.includes('id') ||
+      varName.includes('age') || varName.includes('year') || varName.includes('day') ||
+      varName.endsWith('_i') || varName.startsWith('i') || 
+      varName === 'i' || varName === 'j' || varName === 'k' || varName === 'n') {
+    return `printf("%d\\n", ${formattedValue});`;
+  }
+  
+  // Common float/double patterns
+  if (varName.includes('price') || varName.includes('rate') || varName.includes('percent') || 
+      varName.includes('avg') || varName.includes('average') || varName.includes('temp') ||
+      varName.includes('weight') || varName.includes('height') || varName.includes('salary') ||
+      varName.includes('score') || varName.includes('pi') || varName.includes('ratio')) {
+    return `printf("%.2f\\n", ${formattedValue});`;
+  }
+  
+  // Common string patterns
+  if (varName.includes('name') || varName.includes('title') || varName.includes('message') || 
+      varName.includes('text') || varName.includes('str') || varName.includes('word') ||
+      varName.includes('description') || varName.includes('address') || varName.includes('email')) {
+    return `printf("%s\\n", ${formattedValue});`;
+  }
+  
+  // Common character patterns
+  if (varName.includes('char') || varName === 'c' || varName.includes('letter') ||
+      varName.includes('grade') || varName.endsWith('_ch')) {
+    return `printf("%c\\n", ${formattedValue});`;
+  }
+  
+  // Pointer patterns
+  if (varName.includes('ptr') || varName.includes('pointer') || varName.startsWith('p_')) {
+    return `printf("%p\\n", ${formattedValue});`;
+  }
+  
+  // Default with helpful comment
+  return `printf("%d\\n", ${formattedValue}); /* Change %d to: %s(string), %f(float), %c(char), %p(pointer) */`;
+};
+
+// Utility function to generate all possible C format options
+const generateAllCFormatOptions = (data) => {
+  const value = data.value || 'variable';
+  
+  return {
+    integer: `printf("%d\\n", ${value});`,
+    long: `printf("%ld\\n", ${value});`,
+    float: `printf("%.2f\\n", ${value});`,
+    double: `printf("%.2lf\\n", ${value});`,
+    string: `printf("%s\\n", ${value});`,
+    character: `printf("%c\\n", ${value});`,
+    unsigned: `printf("%u\\n", ${value});`,
+    hex: `printf("0x%x\\n", ${value});`,
+    octal: `printf("%o\\n", ${value});`,
+    pointer: `printf("%p\\n", ${value});`,
+    scientific: `printf("%e\\n", ${value});`
+  };
+};
+
+// Test function to demonstrate the enhanced functionality
+const testEnhancedPrintCode = () => {
+  console.log("=== Enhanced C Print Code Generator Tests ===\\n");
+  
+  const testCases = [
+    // Literal values (auto-detection)
+    { value: '42', description: 'Integer literal' },
+    { value: '3.14', description: 'Float literal' },
+    { value: 'Hello World', description: 'String literal' },
+    { value: 'A', description: 'Character literal' },
+    { value: 'true', description: 'Boolean literal' },
+    
+    // Variables (intelligent naming)
+    { value: 'counter', description: 'Counter variable' },
+    { value: 'userName', description: 'Username variable' },
+    { value: 'price', description: 'Price variable' },
+    { value: 'grade', description: 'Grade variable' },
+    { value: 'ptr', description: 'Pointer variable' },
+    { value: 'i', description: 'Loop variable' },
+    
+    // Explicit type specification
+    { value: 'data', type: 'int', description: 'Explicit integer' },
+    { value: 'message', type: 'string', description: 'Explicit string' },
+    { value: 'temperature', type: 'float', description: 'Explicit float' },
+    { value: 'letter', type: 'char', description: 'Explicit character' },
+    { value: '255', type: 'hex', description: 'Explicit hexadecimal' },
+    { value: 'address', type: 'pointer', description: 'Explicit pointer' }
+  ];
+  
+  testCases.forEach((testCase, index) => {
+    console.log(`\\n${index + 1}. ${testCase.description}:`);
+    console.log(`   Input: value="${testCase.value}"${testCase.type ? `, type="${testCase.type}"` : ' (auto-detect)'}`);
+    
+    const result = generatePrintCode(testCase, 'c');
+    console.log(`   C Output: ${result}`);
+    
+    // Show comparison with other languages
+    console.log(`   Python: ${generatePrintCode(testCase, 'python')}`);
+    console.log(`   Java: ${generatePrintCode(testCase, 'java')}`);
+  });
+  
+  // Show all format options
+  console.log("\\n=== All Available C Format Specifiers ===");
+  const allOptions = generateAllCFormatOptions({ value: 'myVariable' });
+  Object.entries(allOptions).forEach(([format, code]) => {
+    console.log(`${format.padEnd(12)}: ${code}`);
+  });
+};
+
+// Export the functions for use in your existing codebase
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { 
+    generatePrintCode,
+    generateAllCFormatOptions,
+    testEnhancedPrintCode
+  };
+}
+
+// Demo usage
+if (typeof window === 'undefined' && typeof require !== 'undefined') {
+  testEnhancedPrintCode();
+}
 const generateWhileLoopCode = (data, lang) => {
   const condition = data.condition || 'true';
   const body = data.body || '';
