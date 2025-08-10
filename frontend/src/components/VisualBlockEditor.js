@@ -7,6 +7,7 @@ import Block from './Block';
 import { generateCode } from '../utils/codeGenerator';
 import axios from 'axios';
 import Chatbot from './Chatbot';
+
 const VisualBlockEditor = () => {
   const [blocks, setBlocks] = useState([]);
   const [connections, setConnections] = useState([]);
@@ -19,52 +20,69 @@ const VisualBlockEditor = () => {
   const [isEditorPanelOpen, setIsEditorPanelOpen] = useState(true);
   const canvasRef = useRef(null);
 
+  // Positioning constants
+  const blockWidth = 180;
+  const blockHeight = 140;
+  const startX = 50;
+  const startY = 50;
+  const gapX = 20;
+  const gapY = 20;
+
+  // Reposition all blocks based on current canvas width
+  const repositionBlocks = useCallback((blocksToPosition) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return blocksToPosition;
+
+    const canvasWidth = canvas.offsetWidth - startX;
+    const blocksPerRow = Math.max(1, Math.floor(canvasWidth / (blockWidth + gapX)));
+
+    return blocksToPosition.map((block, index) => {
+      const col = index % blocksPerRow;
+      const row = Math.floor(index / blocksPerRow);
+
+      return {
+        ...block,
+        position: {
+          x: startX + col * (blockWidth + gapX),
+          y: startY + row * (blockHeight + gapY),
+        }
+      };
+    });
+  }, [blockWidth, blockHeight, startX, startY, gapX, gapY]);
+
+  // Add a new block and reposition all blocks
   const addBlock = useCallback((blockType) => {
-  const canvas = canvasRef.current;
-  const blockWidth = 180;  // adjust to your actual block + margin
-  const blockHeight = 140; // adjust to actual height + margin
-  const startX = 50;       // starting margin left
-  const startY = 50;       // starting margin top
-  const gapX = 20;         // horizontal gap between blocks
-  const gapY = 20;         // vertical gap between rows
+    const newBlock = {
+      id: uuidv4(),
+      type: blockType,
+      position: { x: 0, y: 0 }, // temporary, will reposition below
+      data: {},
+    };
 
-  let blocksPerRow =1; // fallback
+    setBlocks(prevBlocks => {
+      const newBlocks = [...prevBlocks, newBlock];
+      const repositioned = repositionBlocks(newBlocks);
+      return repositioned;
+    });
 
-  if (canvas) {
-    const canvasWidth = canvas.offsetWidth - startX; // account for left margin
-    blocksPerRow = Math.max(1, Math.floor((canvasWidth) / (blockWidth + gapX)));
-  }
+    setSelectedBlock(newBlock.id);
 
-  const index = blocks.length;
-  const col = index % blocksPerRow;
-  const row = Math.floor(index / blocksPerRow);
+    setConnections(prev => {
+      if (blocks.length === 0) return prev;
+      const lastBlock = blocks[blocks.length - 1];
+      return [...prev, { from: lastBlock.id, to: newBlock.id }];
+    });
 
-  const newX = startX + col * (blockWidth + gapX);
-  const newY = startY + row * (blockHeight + gapY);
+  }, [blocks.length, repositionBlocks, blocks]);
 
-  const newBlock = {
-    id: uuidv4(),
-    type: blockType,
-    position: { x: newX, y: newY },
-    data: {}
-  };
-
-  setBlocks(prev => [...prev, newBlock]);
-  setSelectedBlock(newBlock.id);
-
-  if (blocks.length > 0) {
-    const lastBlock = blocks[blocks.length - 1];
-    setConnections(prev => [...prev, { from: lastBlock.id, to: newBlock.id }]);
-  }
-}, [blocks]);
-
-
+  // Update a block
   const updateBlock = useCallback((blockId, updates) => {
     setBlocks(prev => prev.map(block =>
       block.id === blockId ? { ...block, ...updates } : block
     ));
   }, []);
 
+  // Delete a block and update connections
   const deleteBlock = useCallback((blockId) => {
     setBlocks(prev => prev.filter(b => b.id !== blockId));
 
@@ -102,6 +120,19 @@ const VisualBlockEditor = () => {
     setGeneratedCode(code);
   }, [blocks, selectedLanguage]);
 
+  // Reposition blocks on editor panel toggle
+  useEffect(() => {
+    setBlocks(prev => repositionBlocks(prev));
+  }, [isEditorPanelOpen, repositionBlocks]);
+
+  // Optional: reposition on window resize for responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      setBlocks(prev => repositionBlocks(prev));
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [repositionBlocks]);
 
   const runCode = async () => {
     setIsRunning(true);
@@ -137,10 +168,11 @@ const VisualBlockEditor = () => {
       alert('Failed to save project. Please Login First');
     }
   };
+
   const toggleEditorPanel = () => {
-    setIsEditorPanelOpen(!isEditorPanelOpen);
+    setIsEditorPanelOpen(prev => !prev);
   };
-  
+
   return (
     <div className="block-editor">
       <BlockPalette onAddBlock={addBlock} />
@@ -174,9 +206,9 @@ const VisualBlockEditor = () => {
           </div>
         </div>
         <div className="workspace">
-          <div 
-            className="canvas-area" 
-            style={{ 
+          <div
+            className="canvas-area"
+            style={{
               flex: isEditorPanelOpen ? '1' : '1 1 100%',
               transition: 'all 0.3s ease'
             }}
@@ -189,31 +221,31 @@ const VisualBlockEditor = () => {
                   if (!from || !to) return null;
                   return (
                     <path
-                    key={idx}
-                    d={`
-                      M ${from.position.x + 100},${from.position.y + 65} 
-                      C ${from.position.x + 100},${from.position.y + 120}, 
-                      ${to.position.x + 100},${to.position.y - 40}, 
-                      ${to.position.x + 100},${to.position.y}
-                      `}
+                      key={idx}
+                      d={`
+                        M ${from.position.x + 100},${from.position.y + 65} 
+                        C ${from.position.x + 100},${from.position.y + 120}, 
+                        ${to.position.x + 100},${to.position.y - 40}, 
+                        ${to.position.x + 100},${to.position.y}
+                        `}
                       stroke="black"
                       strokeWidth="2"
                       strokeDasharray="5,5"
                       fill="none"
                       markerEnd="url(#arrowhead)"
-                      />
+                    />
                   );
                 })}
                 <defs>
                   <marker
-                  id="arrowhead"
-                  viewBox="0 0 10 10"
-                  refX="5" refY="5"
-                  markerWidth="6" markerHeight="6"
-                  orient="auto">
+                    id="arrowhead"
+                    viewBox="0 0 10 10"
+                    refX="5" refY="5"
+                    markerWidth="6" markerHeight="6"
+                    orient="auto">
                     <path d="M 0 0 L 10 5 L 0 10 z" fill="black" />
-                    </marker>
-                    </defs>
+                  </marker>
+                </defs>
               </svg>
               {blocks.map((block) => (
                 <Block
@@ -227,7 +259,7 @@ const VisualBlockEditor = () => {
               ))}
             </div>
           </div>
-          <button 
+          <button
             onClick={toggleEditorPanel}
             style={{
               position: 'absolute',
@@ -251,7 +283,7 @@ const VisualBlockEditor = () => {
           >
             {isEditorPanelOpen ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </button>
-          <div 
+          <div
             style={{
               width: isEditorPanelOpen ? '400px' : '0px',
               opacity: isEditorPanelOpen ? 1 : 0,
@@ -312,4 +344,5 @@ const VisualBlockEditor = () => {
     </div>
   );
 };
+
 export default VisualBlockEditor;
