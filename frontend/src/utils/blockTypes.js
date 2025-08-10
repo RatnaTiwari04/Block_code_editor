@@ -21,6 +21,97 @@ export const BLOCK_TYPES = {
       }
     ]
   },
+  DOUBLE_VARIABLE: {
+  id: 'double_variable',
+  label: 'Double Variable',
+  icon: '🔢',
+  description: 'Declare a variable of type double',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myDouble'
+    },
+    {
+      name: 'value',
+      label: 'Value',
+      type: 'text',
+      placeholder: '3.14159'
+    }
+  ]
+},
+
+FLOAT_VARIABLE: {
+  id: 'float_variable',
+  label: 'Float Variable',
+  icon: '🌊',
+  description: 'Declare a variable of type float',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myFloat'
+    },
+    {
+      name: 'value',
+      label: 'Value',
+      type: 'text',
+      placeholder: '1.23f'
+    }
+  ]
+},
+
+LONG_VARIABLE: {
+  id: 'long_variable',
+  label: 'Long Variable',
+  icon: '📏',
+  description: 'Declare a variable of type long',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myLong'
+    },
+    {
+      name: 'value',
+      label: 'Value',
+      type: 'text',
+      placeholder: '123456789L'
+    }
+  ]
+},
+
+CHAR_VARIABLE: {
+  id: 'char_variable',
+  label: 'Char Variable',
+  icon: '🔠',
+  description: 'Declare a variable of type char',
+  inputs: [],
+  outputs: ['value'],
+  fields: [
+    {
+      name: 'name',
+      label: 'Variable Name',
+      type: 'text',
+      placeholder: 'myChar'
+    },
+    {
+      name: 'value',
+      label: 'Value',
+      type: 'text',
+      placeholder: `'a'`
+    }
+  ]
+},
   CONSTANT: {
     id: 'constant',
     label: 'Constant',
