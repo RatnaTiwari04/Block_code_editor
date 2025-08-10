@@ -43,22 +43,6 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-  NUMBER: {
-    id: 'number',
-    label: 'Number',
-    icon: '🔢',
-    description: 'Create a number value',
-    inputs: [],
-    outputs: ['value'],
-    fields: [
-      {
-        name: 'value',
-        label: 'Number Value',
-        type: 'number',
-        placeholder: '42'
-      }
-    ]
-  },
   STRING: {
   id: 'string',
   label: 'String',

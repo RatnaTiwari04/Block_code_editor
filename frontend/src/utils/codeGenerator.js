@@ -444,7 +444,7 @@ const generatePrintCode = (data, lang) => {
     case 'cpp':
       return `cout << ${formattedValue} << endl;`;
     case 'c':
-      return `printf("%s\\n", ${formattedValue});`;
+      return `printf("%d\\n", ${formattedValue});`;
     default:
       return `console.log(${formattedValue});`;
   }

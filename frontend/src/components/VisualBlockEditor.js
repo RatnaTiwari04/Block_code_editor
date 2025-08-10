@@ -26,7 +26,7 @@ const VisualBlockEditor = () => {
   const startX = 50;
   const startY = 50;
   const gapX = 20;
-  const gapY = 20;
+  const gapY = 60;
 
   // Reposition all blocks based on current canvas width
   const repositionBlocks = useCallback((blocksToPosition) => {
