@@ -72,8 +72,7 @@ const VisualBlockEditor = () => {
       const lastBlock = blocks[blocks.length - 1];
       return [...prev, { from: lastBlock.id, to: newBlock.id }];
     });
-
-  }, [blocks.length, repositionBlocks, blocks]);
+  }, [repositionBlocks, blocks]);
 
   // Update a block
   const updateBlock = useCallback((blockId, updates) => {
@@ -134,8 +133,6 @@ useEffect(() => {
 
   repositionAfterPanelToggle();
 }, [isEditorPanelOpen, repositionBlocks]);
-
-
 
   // Optional: repositi on on window resize for responsiveness
   const runCode = async () => {
