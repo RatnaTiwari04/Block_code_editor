@@ -72,8 +72,7 @@ const VisualBlockEditor = () => {
       const lastBlock = blocks[blocks.length - 1];
       return [...prev, { from: lastBlock.id, to: newBlock.id }];
     });
-
-  }, [blocks.length, repositionBlocks, blocks]);
+  }, [repositionBlocks, blocks]);
 
   // Update a block
   const updateBlock = useCallback((blockId, updates) => {
@@ -121,19 +120,21 @@ const VisualBlockEditor = () => {
   }, [blocks, selectedLanguage]);
 
   // Reposition blocks on editor panel toggle
-  useEffect(() => {
-    setBlocks(prev => repositionBlocks(prev));
-  }, [isEditorPanelOpen, repositionBlocks]);
-
-  // Optional: reposition on window resize for responsiveness
-  useEffect(() => {
-    const handleResize = () => {
+useEffect(() => {
+  const repositionAfterPanelToggle = () => {
+    // Give the layout time to finish adjusting before reading width
+    setTimeout(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      console.log('Updated canvas width:', canvas.offsetWidth); // Optional: debug
       setBlocks(prev => repositionBlocks(prev));
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [repositionBlocks]);
+    }, 300); // Match your CSS transition duration (0.3s)
+  };
 
+  repositionAfterPanelToggle();
+}, [isEditorPanelOpen, repositionBlocks]);
+
+  // Optional: repositi on on window resize for responsiveness
   const runCode = async () => {
     setIsRunning(true);
     setOutput('Running...');
