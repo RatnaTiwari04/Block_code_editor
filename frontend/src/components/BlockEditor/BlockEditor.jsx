@@ -9,7 +9,7 @@ import { BLOCK_TYPES } from './BlockTypes/Constants';
 export { BLOCK_TYPES };
 
 const BlockEditor = () => {
-  const [blocks, setBlocks] = useState([]);
+  const [blocks, setBlocks] = useState([]); 
   const [selected, setSelected] = useState(null);
   const [code, setCode] = useState('// Drag blocks to generate code');
   const [output, setOutput] = useState('');
