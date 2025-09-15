@@ -152,11 +152,11 @@ const Chatbot = () => {
     }
     
     if (message.includes('run') || message.includes('execute')) {
-      return "Click the '▶️ Run Code' button to execute your program. The output will appear in the console below the code editor.";
+      return "Click the ' Run Code' button to execute your program. The output will appear in the console below the code editor.";
     }
     
     if (message.includes('save') || message.includes('project')) {
-      return "Don't forget to give your project a title and click '💾 Save Project' to save your work!";
+      return "Don't forget to give your project a title and click ' Save Project' to save your work!";
     }
     
     if (message.includes('language') || message.includes('javascript') || message.includes('python')) {

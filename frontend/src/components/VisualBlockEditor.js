@@ -179,7 +179,7 @@ useEffect(() => {
       <BlockPalette onAddBlock={addBlock} />
       <div className="main-content">
         <div className="header">
-          <h1>🧩 Block Code Editor</h1>
+          <h1> Block Code Editor</h1>
           <div className="header-buttons">
             <input
               type="text"
@@ -201,9 +201,9 @@ useEffect(() => {
             </select>
             <button onClick={clearCanvas} className="btn btn-danger">Clear All</button>
             <button onClick={runCode} disabled={isRunning} className="btn btn-success">
-              {isRunning ? '⏳ Running...' : '▶️ Run Code'}
+              {isRunning ? ' Running...' : ' Run Code'}
             </button>
-            <button onClick={saveProject} className="btn btn-primary">💾 Save Project</button>
+            <button onClick={saveProject} className="btn btn-primary"> Save Project</button>
           </div>
         </div>
         <div className="workspace">
@@ -303,7 +303,7 @@ useEffect(() => {
               fontWeight: 'bold',
               whiteSpace: 'nowrap'
             }}>
-              📝 Generated Code ({selectedLanguage})
+               Generated Code ({selectedLanguage})
             </div>
             <div style={{ flex: 1, minHeight: '300px' }}>
               <Editor

@@ -2,7 +2,7 @@ export const BLOCK_TYPES = {
   VARIABLE: {
     id: 'variable',
     label: 'Variable',
-    icon: '📦',
+    icon: '',
     description: 'Create a variable',
     inputs: [],
     outputs: ['value'],
@@ -24,7 +24,7 @@ export const BLOCK_TYPES = {
   CONSTANT: {
     id: 'constant',
     label: 'Constant',
-    icon: '🔒',
+    icon: '',
     description: 'Create a constant value',
     inputs: [],
     outputs: ['value'],
@@ -46,7 +46,7 @@ export const BLOCK_TYPES = {
   NUMBER: {
     id: 'number',
     label: 'Number',
-    icon: '🔢',
+    icon: '',
     description: 'Create a number value',
     inputs: [],
     outputs: ['value'],
@@ -62,7 +62,7 @@ export const BLOCK_TYPES = {
   STRING: {
   id: 'string',
   label: 'String',
-  icon: '📝',
+  icon: '',
   description: 'Create a text string',
   inputs: [],
   outputs: ['value'],
@@ -84,7 +84,7 @@ export const BLOCK_TYPES = {
   BOOLEAN: {
   id: 'boolean',
   label: 'Boolean',
-  icon: '✅',
+  icon: '',
   description: 'Create a true/false value',
   inputs: [],
   outputs: ['value'],
@@ -107,7 +107,7 @@ export const BLOCK_TYPES = {
   ARRAY: {
     id: 'array',
     label: 'Array',
-    icon: '📋',
+    icon: '',
     description: 'Create an array/list',
     inputs: [],
     outputs: ['array'],
@@ -130,7 +130,7 @@ export const BLOCK_TYPES = {
   OBJECT: {
     id: 'object',
     label: 'Object',
-    icon: '🏗️',
+    icon: '',
     description: 'Create an object',
     inputs: [],
     outputs: ['object'],
@@ -152,7 +152,7 @@ export const BLOCK_TYPES = {
   FUNCTION: {
     id: 'function',
     label: 'Function',
-    icon: '⚙️',
+    icon: '',
     description: 'Define a function',
     inputs: [],
     outputs: ['function'],
@@ -180,7 +180,7 @@ export const BLOCK_TYPES = {
   FUNCTION_CALL: {
     id: 'function_call',
     label: 'Function Call',
-    icon: '📞',
+    icon: '',
     description: 'Call a function',
     inputs: ['function'],
     outputs: ['result'],
@@ -202,7 +202,7 @@ export const BLOCK_TYPES = {
   RETURN: {
     id: 'return',
     label: 'Return',
-    icon: '↩️',
+    icon: '',
     description: 'Return a value from function',
     inputs: ['value'],
     outputs: [],
@@ -218,7 +218,7 @@ export const BLOCK_TYPES = {
   IF: {
     id: 'if',
     label: 'If Statement',
-    icon: '🔀',
+    icon: '',
     description: 'Conditional logic',
     inputs: ['condition'],
     outputs: ['then', 'else'],
@@ -246,7 +246,7 @@ export const BLOCK_TYPES = {
   ELSE_IF: {
     id: 'else_if',
     label: 'Else If',
-    icon: '🔀',
+    icon: '',
     description: 'Additional condition in if chain',
     inputs: ['condition'],
     outputs: ['then', 'next'],
@@ -268,7 +268,7 @@ export const BLOCK_TYPES = {
   SWITCH: {
     id: 'switch',
     label: 'Switch Statement',
-    icon: '🎛️',
+    icon: '',
     description: 'Multi-way conditional',
     inputs: ['value'],
     outputs: ['cases', 'default'],
@@ -296,7 +296,7 @@ export const BLOCK_TYPES = {
   LOOP: {
     id: 'for_loop',
     label: 'For Loop',
-    icon: '🔄',
+    icon: '',
     description: 'Repeat code with counter',
     inputs: [],
     outputs: ['body'],
@@ -336,7 +336,7 @@ export const BLOCK_TYPES = {
   WHILE_LOOP: {
     id: 'while_loop',
     label: 'While Loop',
-    icon: '🔁',
+    icon: '',
     description: 'Repeat while condition is true',
     inputs: ['condition'],
     outputs: ['body'],
@@ -358,7 +358,7 @@ export const BLOCK_TYPES = {
   DO_WHILE_LOOP: {
     id: 'do_while_loop',
     label: 'Do-While Loop',
-    icon: '🔃',
+    icon: '',
     description: 'Execute once, then repeat while condition is true',
     inputs: ['condition'],
     outputs: ['body'],
@@ -380,7 +380,7 @@ export const BLOCK_TYPES = {
   FOR_EACH: {
     id: 'for_each',
     label: 'For Each',
-    icon: '🔄',
+    icon: '',
     description: 'Iterate over array elements',
     inputs: ['array'],
     outputs: ['body'],
@@ -409,7 +409,7 @@ export const BLOCK_TYPES = {
   BREAK: {
     id: 'break',
     label: 'Break',
-    icon: '🛑',
+    icon: '',
     description: 'Break out of loop',
     inputs: [],
     outputs: [],
@@ -419,7 +419,7 @@ export const BLOCK_TYPES = {
   CONTINUE: {
     id: 'continue',
     label: 'Continue',
-    icon: '⏭️',
+    icon: '',
     description: 'Skip to next iteration',
     inputs: [],
     outputs: [],
@@ -429,7 +429,7 @@ export const BLOCK_TYPES = {
   MATH: {
     id: 'math',
     label: 'Math Operation',
-    icon: '➕',
+    icon: '',
     description: 'Perform mathematical operations',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -465,7 +465,7 @@ export const BLOCK_TYPES = {
   MATH_FUNCTION: {
     id: 'math_function',
     label: 'Math Function',
-    icon: '📐',
+    icon: '',
     description: 'Mathematical functions',
     inputs: ['value'],
     outputs: ['result'],
@@ -495,7 +495,7 @@ export const BLOCK_TYPES = {
   INCREMENT: {
     id: 'increment',
     label: 'Increment',
-    icon: '⬆️',
+    icon: '',
     description: 'Increase variable by 1',
     inputs: ['variable'],
     outputs: ['result'],
@@ -512,7 +512,7 @@ export const BLOCK_TYPES = {
   DECREMENT: {
     id: 'decrement',
     label: 'Decrement',
-    icon: '⬇️',
+    icon: '',
     description: 'Decrease variable by 1',
     inputs: ['variable'],
     outputs: ['result'],
@@ -528,7 +528,7 @@ export const BLOCK_TYPES = {
   COMPARISON: {
     id: 'comparison',
     label: 'Comparison',
-    icon: '⚖️',
+    icon: '',
     description: 'Compare two values',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -557,7 +557,7 @@ export const BLOCK_TYPES = {
   LOGICAL: {
     id: 'logical',
     label: 'Logical Operation',
-    icon: '🧠',
+    icon: '',
     description: 'Logical AND, OR, NOT',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -586,7 +586,7 @@ export const BLOCK_TYPES = {
   STRING_CONCAT: {
     id: 'string_concat',
     label: 'String Concatenation',
-    icon: '🔗',
+    icon: '',
     description: 'Join strings together',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -614,7 +614,7 @@ export const BLOCK_TYPES = {
   STRING_LENGTH: {
     id: 'string_length',
     label: 'String Length',
-    icon: '📏',
+    icon: '',
     description: 'Get length of string',
     inputs: ['string'],
     outputs: ['length'],
@@ -636,7 +636,7 @@ export const BLOCK_TYPES = {
   SUBSTRING: {
     id: 'substring',
     label: 'Substring',
-    icon: '✂️',
+    icon: '',
     description: 'Extract part of string',
     inputs: ['string'],
     outputs: ['result'],
@@ -670,7 +670,7 @@ export const BLOCK_TYPES = {
   ARRAY_LENGTH: {
     id: 'array_length',
     label: 'Array Length',
-    icon: '📐',
+    icon: '',
     description: 'Get array length',
     inputs: ['array'],
     outputs: ['length'],
@@ -693,7 +693,7 @@ export const BLOCK_TYPES = {
   ARRAY_PUSH: {
     id: 'array_push',
     label: 'Array Push',
-    icon: '📌',
+    icon: '',
     description: 'Add element to end of array',
     inputs: ['array', 'value'],
     outputs: ['array'],
@@ -716,7 +716,7 @@ export const BLOCK_TYPES = {
   ARRAY_POP: {
     id: 'array_pop',
     label: 'Array Pop',
-    icon: '🗑️',
+    icon: '',
     description: 'Remove last element from array',
     inputs: ['array'],
     outputs: ['array', 'value'],
@@ -739,7 +739,7 @@ export const BLOCK_TYPES = {
   ARRAY_GET: {
     id: 'array_get',
     label: 'Array Get',
-    icon: '🎯',
+    icon: '',
     description: 'Get element at index',
     inputs: ['array', 'index'],
     outputs: ['value'],
@@ -768,7 +768,7 @@ export const BLOCK_TYPES = {
   ARRAY_SET: {
     id: 'array_set',
     label: 'Array Set',
-    icon: '📝',
+    icon: '',
     description: 'Set element at index',
     inputs: ['array', 'index', 'value'],
     outputs: ['array'],
@@ -798,7 +798,7 @@ export const BLOCK_TYPES = {
   INPUT: {
     id: 'input',
     label: 'User Input',
-    icon: '⌨️',
+    icon: '',
     description: 'Get input from user',
     inputs: [],
     outputs: ['value'],
@@ -821,7 +821,7 @@ export const BLOCK_TYPES = {
   PRINT: {
     id: 'print',
     label: 'Print',
-    icon: '🖨️',
+    icon: '',
     description: 'Print output to console',
     inputs: ['value'],
     outputs: [],
@@ -838,7 +838,7 @@ export const BLOCK_TYPES = {
   ALERT: {
     id: 'alert',
     label: 'Alert',
-    icon: '🚨',
+    icon: '',
     description: 'Show alert dialog',
     inputs: ['message'],
     outputs: [],
@@ -856,7 +856,7 @@ export const BLOCK_TYPES = {
   TRY_CATCH: {
     id: 'try_catch',
     label: 'Try-Catch',
-    icon: '🛡️',
+    icon: '',
     description: 'Handle errors',
     inputs: [],
     outputs: ['try', 'catch', 'finally'],
@@ -885,7 +885,7 @@ export const BLOCK_TYPES = {
   THROW: {
     id: 'throw',
     label: 'Throw Error',
-    icon: '💥',
+    icon: '',
     description: 'Throw an error',
     inputs: ['message'],
     outputs: [],
@@ -903,7 +903,7 @@ export const BLOCK_TYPES = {
   DELAY: {
     id: 'delay',
     label: 'Delay/Sleep',
-    icon: '⏱️',
+    icon: '',
     description: 'Wait for specified time',
     inputs: [],
     outputs: ['next'],
@@ -920,7 +920,7 @@ export const BLOCK_TYPES = {
   TIMER: {
     id: 'timer',
     label: 'Timer',
-    icon: '⏰',
+    icon: '',
     description: 'Execute code after delay',
     inputs: [],
     outputs: ['callback'],
@@ -944,7 +944,7 @@ export const BLOCK_TYPES = {
   TO_STRING: {
     id: 'to_string',
     label: 'To String',
-    icon: '🔤',
+    icon: '',
     description: 'Convert to string',
     inputs: ['value'],
     outputs: ['result'],
@@ -967,7 +967,7 @@ export const BLOCK_TYPES = {
   TO_NUMBER: {
     id: 'to_number',
     label: 'To Number',
-    icon: '🔢',
+    icon: '',
     description: 'Convert to number',
     inputs: ['value'],
     outputs: ['result'],
@@ -990,7 +990,7 @@ export const BLOCK_TYPES = {
   TO_BOOLEAN: {
     id: 'to_boolean',
     label: 'To Boolean',
-    icon: '✅',
+    icon: '',
     description: 'Convert to boolean',
     inputs: ['value'],
     outputs: ['result'],
@@ -1012,7 +1012,7 @@ export const BLOCK_TYPES = {
   RANDOM: {
     id: 'random',
     label: 'Random Number',
-    icon: '🎲',
+    icon: '',
     description: 'Generate random number',
     inputs: [],
     outputs: ['result'],
@@ -1042,7 +1042,7 @@ export const BLOCK_TYPES = {
   COMMENT: {
     id: 'comment',
     label: 'Comment',
-    icon: '💬',
+    icon: '',
     description: 'Add comments to your code',
     inputs: [],
     outputs: [],
@@ -1060,7 +1060,7 @@ export const BLOCK_TYPES = {
   START: {
     id: 'start',
     label: 'Start',
-    icon: '🚀',
+    icon: '',
     description: 'Program entry point',
     inputs: [],
     outputs: ['next'],
@@ -1070,7 +1070,7 @@ export const BLOCK_TYPES = {
   END: {
     id: 'end',
     label: 'End',
-    icon: '🏁',
+    icon: '',
     description: 'Program termination',
     inputs: ['previous'],
     outputs: [],

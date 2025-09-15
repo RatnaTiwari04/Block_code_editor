@@ -20,7 +20,7 @@ const Navbar = () => {
             to="/" 
             className="text-xl font-bold text-teal-400 hover:text-teal-300 transition-colors duration-200 flex items-center gap-2"
           >
-            <span>🧩</span>
+            <span></span>
             <span>Block Code Editor</span>
           </Link>
         </div>
