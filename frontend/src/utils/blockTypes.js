@@ -2,7 +2,7 @@ export const BLOCK_TYPES = {
   VARIABLE: {
     id: 'variable',
     label: 'Variable',
-    icon: '📦',
+    icon: '',
     description: 'Create a variable',
     inputs: [],
     outputs: ['value'],
@@ -21,101 +21,10 @@ export const BLOCK_TYPES = {
       }
     ]
   },
-  DOUBLE_VARIABLE: {
-  id: 'double_variable',
-  label: 'Double Variable',
-  icon: '🔢',
-  description: 'Declare a variable of type double',
-  inputs: [],
-  outputs: ['value'],
-  fields: [
-    {
-      name: 'name',
-      label: 'Variable Name',
-      type: 'text',
-      placeholder: 'myDouble'
-    },
-    {
-      name: 'value',
-      label: 'Value',
-      type: 'text',
-      placeholder: '3.14159'
-    }
-  ]
-},
-
-FLOAT_VARIABLE: {
-  id: 'float_variable',
-  label: 'Float Variable',
-  icon: '🌊',
-  description: 'Declare a variable of type float',
-  inputs: [],
-  outputs: ['value'],
-  fields: [
-    {
-      name: 'name',
-      label: 'Variable Name',
-      type: 'text',
-      placeholder: 'myFloat'
-    },
-    {
-      name: 'value',
-      label: 'Value',
-      type: 'text',
-      placeholder: '1.23f'
-    }
-  ]
-},
-
-LONG_VARIABLE: {
-  id: 'long_variable',
-  label: 'Long Variable',
-  icon: '📏',
-  description: 'Declare a variable of type long',
-  inputs: [],
-  outputs: ['value'],
-  fields: [
-    {
-      name: 'name',
-      label: 'Variable Name',
-      type: 'text',
-      placeholder: 'myLong'
-    },
-    {
-      name: 'value',
-      label: 'Value',
-      type: 'text',
-      placeholder: '123456789L'
-    }
-  ]
-},
-
-CHAR_VARIABLE: {
-  id: 'char_variable',
-  label: 'Char Variable',
-  icon: '🔠',
-  description: 'Declare a variable of type char',
-  inputs: [],
-  outputs: ['value'],
-  fields: [
-    {
-      name: 'name',
-      label: 'Variable Name',
-      type: 'text',
-      placeholder: 'myChar'
-    },
-    {
-      name: 'value',
-      label: 'Value',
-      type: 'text',
-      placeholder: `'a'`
-    }
-  ]
-},
   CONSTANT: {
     id: 'constant',
     label: 'Constant',
-    icon: '🔒',
+    icon: '',
     description: 'Create a constant value',
     inputs: [],
     outputs: ['value'],
@@ -134,10 +43,26 @@ CHAR_VARIABLE: {
       }
     ]
   },
+  NUMBER: {
+    id: 'number',
+    label: 'Number',
+    icon: '',
+    description: 'Create a number value',
+    inputs: [],
+    outputs: ['value'],
+    fields: [
+      {
+        name: 'value',
+        label: 'Number Value',
+        type: 'number',
+        placeholder: '42'
+      }
+    ]
+  },
   STRING: {
   id: 'string',
   label: 'String',
-  icon: '📝',
+  icon: '',
   description: 'Create a text string',
   inputs: [],
   outputs: ['value'],
@@ -159,7 +84,7 @@ CHAR_VARIABLE: {
   BOOLEAN: {
   id: 'boolean',
   label: 'Boolean',
-  icon: '✅',
+  icon: '',
   description: 'Create a true/false value',
   inputs: [],
   outputs: ['value'],
@@ -182,7 +107,7 @@ CHAR_VARIABLE: {
   ARRAY: {
     id: 'array',
     label: 'Array',
-    icon: '📋',
+    icon: '',
     description: 'Create an array/list',
     inputs: [],
     outputs: ['array'],
@@ -205,7 +130,7 @@ CHAR_VARIABLE: {
   OBJECT: {
     id: 'object',
     label: 'Object',
-    icon: '🏗️',
+    icon: '',
     description: 'Create an object',
     inputs: [],
     outputs: ['object'],
@@ -227,7 +152,7 @@ CHAR_VARIABLE: {
   FUNCTION: {
     id: 'function',
     label: 'Function',
-    icon: '⚙️',
+    icon: '',
     description: 'Define a function',
     inputs: [],
     outputs: ['function'],
@@ -255,7 +180,7 @@ CHAR_VARIABLE: {
   FUNCTION_CALL: {
     id: 'function_call',
     label: 'Function Call',
-    icon: '📞',
+    icon: '',
     description: 'Call a function',
     inputs: ['function'],
     outputs: ['result'],
@@ -277,7 +202,7 @@ CHAR_VARIABLE: {
   RETURN: {
     id: 'return',
     label: 'Return',
-    icon: '↩️',
+    icon: '',
     description: 'Return a value from function',
     inputs: ['value'],
     outputs: [],
@@ -293,7 +218,7 @@ CHAR_VARIABLE: {
   IF: {
     id: 'if',
     label: 'If Statement',
-    icon: '🔀',
+    icon: '',
     description: 'Conditional logic',
     inputs: ['condition'],
     outputs: ['then', 'else'],
@@ -321,7 +246,7 @@ CHAR_VARIABLE: {
   ELSE_IF: {
     id: 'else_if',
     label: 'Else If',
-    icon: '🔀',
+    icon: '',
     description: 'Additional condition in if chain',
     inputs: ['condition'],
     outputs: ['then', 'next'],
@@ -343,7 +268,7 @@ CHAR_VARIABLE: {
   SWITCH: {
     id: 'switch',
     label: 'Switch Statement',
-    icon: '🎛️',
+    icon: '',
     description: 'Multi-way conditional',
     inputs: ['value'],
     outputs: ['cases', 'default'],
@@ -371,7 +296,7 @@ CHAR_VARIABLE: {
   LOOP: {
     id: 'for_loop',
     label: 'For Loop',
-    icon: '🔄',
+    icon: '',
     description: 'Repeat code with counter',
     inputs: [],
     outputs: ['body'],
@@ -411,7 +336,7 @@ CHAR_VARIABLE: {
   WHILE_LOOP: {
     id: 'while_loop',
     label: 'While Loop',
-    icon: '🔁',
+    icon: '',
     description: 'Repeat while condition is true',
     inputs: ['condition'],
     outputs: ['body'],
@@ -433,7 +358,7 @@ CHAR_VARIABLE: {
   DO_WHILE_LOOP: {
     id: 'do_while_loop',
     label: 'Do-While Loop',
-    icon: '🔃',
+    icon: '',
     description: 'Execute once, then repeat while condition is true',
     inputs: ['condition'],
     outputs: ['body'],
@@ -455,7 +380,7 @@ CHAR_VARIABLE: {
   FOR_EACH: {
     id: 'for_each',
     label: 'For Each',
-    icon: '🔄',
+    icon: '',
     description: 'Iterate over array elements',
     inputs: ['array'],
     outputs: ['body'],
@@ -484,7 +409,7 @@ CHAR_VARIABLE: {
   BREAK: {
     id: 'break',
     label: 'Break',
-    icon: '🛑',
+    icon: '',
     description: 'Break out of loop',
     inputs: [],
     outputs: [],
@@ -494,7 +419,7 @@ CHAR_VARIABLE: {
   CONTINUE: {
     id: 'continue',
     label: 'Continue',
-    icon: '⏭️',
+    icon: '',
     description: 'Skip to next iteration',
     inputs: [],
     outputs: [],
@@ -504,7 +429,7 @@ CHAR_VARIABLE: {
   MATH: {
     id: 'math',
     label: 'Math Operation',
-    icon: '➕',
+    icon: '',
     description: 'Perform mathematical operations',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -540,7 +465,7 @@ CHAR_VARIABLE: {
   MATH_FUNCTION: {
     id: 'math_function',
     label: 'Math Function',
-    icon: '📐',
+    icon: '',
     description: 'Mathematical functions',
     inputs: ['value'],
     outputs: ['result'],
@@ -570,7 +495,7 @@ CHAR_VARIABLE: {
   INCREMENT: {
     id: 'increment',
     label: 'Increment',
-    icon: '⬆️',
+    icon: '',
     description: 'Increase variable by 1',
     inputs: ['variable'],
     outputs: ['result'],
@@ -587,7 +512,7 @@ CHAR_VARIABLE: {
   DECREMENT: {
     id: 'decrement',
     label: 'Decrement',
-    icon: '⬇️',
+    icon: '',
     description: 'Decrease variable by 1',
     inputs: ['variable'],
     outputs: ['result'],
@@ -603,7 +528,7 @@ CHAR_VARIABLE: {
   COMPARISON: {
     id: 'comparison',
     label: 'Comparison',
-    icon: '⚖️',
+    icon: '',
     description: 'Compare two values',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -632,7 +557,7 @@ CHAR_VARIABLE: {
   LOGICAL: {
     id: 'logical',
     label: 'Logical Operation',
-    icon: '🧠',
+    icon: '',
     description: 'Logical AND, OR, NOT',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -661,7 +586,7 @@ CHAR_VARIABLE: {
   STRING_CONCAT: {
     id: 'string_concat',
     label: 'String Concatenation',
-    icon: '🔗',
+    icon: '',
     description: 'Join strings together',
     inputs: ['left', 'right'],
     outputs: ['result'],
@@ -689,7 +614,7 @@ CHAR_VARIABLE: {
   STRING_LENGTH: {
     id: 'string_length',
     label: 'String Length',
-    icon: '📏',
+    icon: '',
     description: 'Get length of string',
     inputs: ['string'],
     outputs: ['length'],
@@ -711,7 +636,7 @@ CHAR_VARIABLE: {
   SUBSTRING: {
     id: 'substring',
     label: 'Substring',
-    icon: '✂️',
+    icon: '',
     description: 'Extract part of string',
     inputs: ['string'],
     outputs: ['result'],
@@ -745,7 +670,7 @@ CHAR_VARIABLE: {
   ARRAY_LENGTH: {
     id: 'array_length',
     label: 'Array Length',
-    icon: '📐',
+    icon: '',
     description: 'Get array length',
     inputs: ['array'],
     outputs: ['length'],
@@ -768,7 +693,7 @@ CHAR_VARIABLE: {
   ARRAY_PUSH: {
     id: 'array_push',
     label: 'Array Push',
-    icon: '📌',
+    icon: '',
     description: 'Add element to end of array',
     inputs: ['array', 'value'],
     outputs: ['array'],
@@ -791,7 +716,7 @@ CHAR_VARIABLE: {
   ARRAY_POP: {
     id: 'array_pop',
     label: 'Array Pop',
-    icon: '🗑️',
+    icon: '',
     description: 'Remove last element from array',
     inputs: ['array'],
     outputs: ['array', 'value'],
@@ -814,7 +739,7 @@ CHAR_VARIABLE: {
   ARRAY_GET: {
     id: 'array_get',
     label: 'Array Get',
-    icon: '🎯',
+    icon: '',
     description: 'Get element at index',
     inputs: ['array', 'index'],
     outputs: ['value'],
@@ -843,7 +768,7 @@ CHAR_VARIABLE: {
   ARRAY_SET: {
     id: 'array_set',
     label: 'Array Set',
-    icon: '📝',
+    icon: '',
     description: 'Set element at index',
     inputs: ['array', 'index', 'value'],
     outputs: ['array'],
@@ -873,7 +798,7 @@ CHAR_VARIABLE: {
   INPUT: {
     id: 'input',
     label: 'User Input',
-    icon: '⌨️',
+    icon: '',
     description: 'Get input from user',
     inputs: [],
     outputs: ['value'],
@@ -896,7 +821,7 @@ CHAR_VARIABLE: {
   PRINT: {
     id: 'print',
     label: 'Print',
-    icon: '🖨️',
+    icon: '',
     description: 'Print output to console',
     inputs: ['value'],
     outputs: [],
@@ -913,7 +838,7 @@ CHAR_VARIABLE: {
   ALERT: {
     id: 'alert',
     label: 'Alert',
-    icon: '🚨',
+    icon: '',
     description: 'Show alert dialog',
     inputs: ['message'],
     outputs: [],
@@ -931,7 +856,7 @@ CHAR_VARIABLE: {
   TRY_CATCH: {
     id: 'try_catch',
     label: 'Try-Catch',
-    icon: '🛡️',
+    icon: '',
     description: 'Handle errors',
     inputs: [],
     outputs: ['try', 'catch', 'finally'],
@@ -960,7 +885,7 @@ CHAR_VARIABLE: {
   THROW: {
     id: 'throw',
     label: 'Throw Error',
-    icon: '💥',
+    icon: '',
     description: 'Throw an error',
     inputs: ['message'],
     outputs: [],
@@ -978,7 +903,7 @@ CHAR_VARIABLE: {
   DELAY: {
     id: 'delay',
     label: 'Delay/Sleep',
-    icon: '⏱️',
+    icon: '',
     description: 'Wait for specified time',
     inputs: [],
     outputs: ['next'],
@@ -995,7 +920,7 @@ CHAR_VARIABLE: {
   TIMER: {
     id: 'timer',
     label: 'Timer',
-    icon: '⏰',
+    icon: '',
     description: 'Execute code after delay',
     inputs: [],
     outputs: ['callback'],
@@ -1019,7 +944,7 @@ CHAR_VARIABLE: {
   TO_STRING: {
     id: 'to_string',
     label: 'To String',
-    icon: '🔤',
+    icon: '',
     description: 'Convert to string',
     inputs: ['value'],
     outputs: ['result'],
@@ -1042,7 +967,7 @@ CHAR_VARIABLE: {
   TO_NUMBER: {
     id: 'to_number',
     label: 'To Number',
-    icon: '🔢',
+    icon: '',
     description: 'Convert to number',
     inputs: ['value'],
     outputs: ['result'],
@@ -1065,7 +990,7 @@ CHAR_VARIABLE: {
   TO_BOOLEAN: {
     id: 'to_boolean',
     label: 'To Boolean',
-    icon: '✅',
+    icon: '',
     description: 'Convert to boolean',
     inputs: ['value'],
     outputs: ['result'],
@@ -1087,7 +1012,7 @@ CHAR_VARIABLE: {
   RANDOM: {
     id: 'random',
     label: 'Random Number',
-    icon: '🎲',
+    icon: '',
     description: 'Generate random number',
     inputs: [],
     outputs: ['result'],
@@ -1117,7 +1042,7 @@ CHAR_VARIABLE: {
   COMMENT: {
     id: 'comment',
     label: 'Comment',
-    icon: '💬',
+    icon: '',
     description: 'Add comments to your code',
     inputs: [],
     outputs: [],
@@ -1135,7 +1060,7 @@ CHAR_VARIABLE: {
   START: {
     id: 'start',
     label: 'Start',
-    icon: '🚀',
+    icon: '',
     description: 'Program entry point',
     inputs: [],
     outputs: ['next'],
@@ -1145,7 +1070,7 @@ CHAR_VARIABLE: {
   END: {
     id: 'end',
     label: 'End',
-    icon: '🏁',
+    icon: '',
     description: 'Program termination',
     inputs: ['previous'],
     outputs: [],
