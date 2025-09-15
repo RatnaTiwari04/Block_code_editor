@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Chatbot.css';
 
-// Gemini API configuration - Updated to use environment variable for Create React App
 const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-// Debug logging (remove in production)
 console.log('API Key loaded:', GEMINI_API_KEY ? 'Yes' : 'No');
 console.log('API Key (first 10 chars):', GEMINI_API_KEY?.substring(0, 10));
 
